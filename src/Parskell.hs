@@ -18,6 +18,10 @@ calcIo = do putStrLn "Formula:"
              defaultReturn Nothing = putStrLn "Input code not be parsed!"
 
 
+readMaybeUnpack :: Text -> Maybe Double
+readMaybeUnpack = readMaybe . Data.Text.unpack
+
+
 
 calcAtom :: Char -> Maybe (Double -> Double -> Double)
 calcAtom '+' = Just (+)
@@ -48,7 +52,6 @@ divideFormula formula
 calc :: Maybe Text -> Maybe Text
 calc (Just formula) 
     | Data.Text.any (`elem` operators) formula = do
-        let readMaybeUnpack = readMaybe . Data.Text.unpack :: Text -> Maybe Double
         (left, opChar, right) <- divideFormula formula
         calculatedLeft <- calc . Just $ left
         calculatedLeftNumber <- readMaybeUnpack calculatedLeft
