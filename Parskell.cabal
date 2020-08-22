@@ -1,6 +1,6 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.34.1.
+-- This file has been generated from package.yaml by hpack version 0.34.2.
 --
 -- see: https://github.com/sol/hpack
 
@@ -9,9 +9,9 @@ version:        0.1.0.0
 description:    Please see the README on GitHub at <https://github.com/Hafflationist/Parskell#readme>
 homepage:       https://github.com/Hafflationist/Parskell#readme
 bug-reports:    https://github.com/Hafflationist/Parskell/issues
-author:         Author name here
+author:         Hafflationist
 maintainer:     Author email here
-copyright:      2019 Author name here
+copyright:      2020 Hafflationist
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
@@ -45,6 +45,7 @@ executable Parskell-exe
   build-depends:
       Parskell
     , base >=4.7 && <5
+    , text
   default-language: Haskell2010
 
 test-suite Parskell-test
@@ -58,4 +59,5 @@ test-suite Parskell-test
   build-depends:
       Parskell
     , base >=4.7 && <5
+    , text
   default-language: Haskell2010
