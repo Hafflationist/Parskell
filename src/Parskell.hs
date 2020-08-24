@@ -18,6 +18,10 @@ calcIo = do putStrLn "Formula:"
              defaultReturn Nothing = putStrLn "Input code not be parsed!"
 
 
+-- TODO Seperate evaluation from parsing
+-- 1. generate expression tree
+-- 2. EVALUATION
+
 readMaybeUnpack :: Text -> Maybe Double
 readMaybeUnpack = readMaybe . Data.Text.unpack
 
