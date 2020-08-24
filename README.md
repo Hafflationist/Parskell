@@ -1,1 +1,2 @@
-# HaskellTest
+# Parskell
+Messing around with Haskell...
