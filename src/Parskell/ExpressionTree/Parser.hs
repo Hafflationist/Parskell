@@ -4,13 +4,6 @@ import Data.Text
 import Text.Read
 import Parskell.ExpressionTree
 
-import Debug.Trace
-
-
-
-operators :: [Char]
-operators = ['+', '-', '*', '/']
-
 
 
 readMaybeUnpack :: Text -> Maybe Double

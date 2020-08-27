@@ -21,4 +21,5 @@ out/
 cabal.project.local
 cabal.project.local~
 .HTF/
+.idea
 .ghc.environment.*
