@@ -26,6 +26,10 @@ source-repository head
 library
   exposed-modules:
       Parskell
+      Parskell.ExpressionTree
+      Parskell.ExpressionTree.Evaluation
+      Parskell.ExpressionTree.Parser
+      Test
   other-modules:
       Paths_Parskell
   hs-source-dirs:

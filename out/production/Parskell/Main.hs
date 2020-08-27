@@ -3,4 +3,4 @@ module Main where
 import Parskell
 
 main :: IO ()
-main = someFunc
+main = calcIo
