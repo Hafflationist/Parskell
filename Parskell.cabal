@@ -27,6 +27,7 @@ library
   exposed-modules:
       Parskell
       Parskell.ExpressionTree
+      Parskell.ExpressionTree.Conversion
       Parskell.ExpressionTree.Evaluation
       Parskell.ExpressionTree.Parser
       Test

@@ -3,6 +3,7 @@ module Parskell.ExpressionTree.Parser where
 import Data.Text
 import Text.Read
 import Parskell.ExpressionTree
+import Parskell.ExpressionTree.Conversion
 
 
 
@@ -14,7 +15,7 @@ readMaybeUnpack = readMaybe . Data.Text.unpack
 splitOnAndParse :: Text -> BinaryOperator -> Text -> Maybe Expression
 splitOnAndParse operatorText operator text = 
     let left : rightList = splitOn operatorText text
-        right = Data.Text.concat rightList
+        right = Data.Text.intercalate (binaryOperator2Text operator) rightList
     in do 
         leftExpression <- parseExpression left
         rightExpression <- parseExpression right
@@ -22,12 +23,16 @@ splitOnAndParse operatorText operator text =
 
 
 
+shouldSplitOn :: Text -> Text -> Bool
+shouldSplitOn formula operator = operator `isInfixOf` formula
+
+
 parseExpression :: Text -> Maybe Expression
 parseExpression text
-    | Data.Text.pack "+" `isInfixOf` text = splitOnAndParse (Data.Text.pack "+") Addition text
-    | Data.Text.pack "-" `isInfixOf` text = splitOnAndParse (Data.Text.pack "-") Subtraction text
-    | Data.Text.pack "*" `isInfixOf` text = splitOnAndParse (Data.Text.pack "*") Multiplication text
-    | Data.Text.pack "/" `isInfixOf` text = splitOnAndParse (Data.Text.pack "/") Division text
+    | text `shouldSplitOn` Data.Text.pack "+"  = splitOnAndParse (Data.Text.pack "+") Addition text
+    | text `shouldSplitOn` Data.Text.pack "-"  = splitOnAndParse (Data.Text.pack "-") Subtraction text
+    | text `shouldSplitOn` Data.Text.pack "*"  = splitOnAndParse (Data.Text.pack "*") Multiplication text
+    | text `shouldSplitOn` Data.Text.pack "/"  = splitOnAndParse (Data.Text.pack "/") Division text
            
 parseExpression const = do 
     value <- readMaybeUnpack const

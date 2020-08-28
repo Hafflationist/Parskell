@@ -3,6 +3,7 @@ module Parskell.ExpressionTree.Evaluation where
 import Parskell.ExpressionTree
 
 
+
 applyOperator :: Expression -> Expression -> (Double -> Double -> Double) -> Maybe Double
 applyOperator exp1 exp2 op = do 
     a <- eval exp1
