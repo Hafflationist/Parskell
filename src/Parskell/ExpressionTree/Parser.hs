@@ -14,7 +14,7 @@ readMaybeUnpack = readMaybe . Data.Text.unpack
 splitOnAndParse :: Text -> BinaryOperator -> Text -> Maybe Expression
 splitOnAndParse operatorText operator text = 
     let left : rightList = splitOn operatorText text
-        right = trace ("both sides: " ++ Data.Text.unpack left ++ " | " ++ (Data.Text.unpack . Data.Text.concat $ rightList)) Data.Text.concat rightList
+        right = Data.Text.concat rightList
     in do 
         leftExpression <- parseExpression left
         rightExpression <- parseExpression right

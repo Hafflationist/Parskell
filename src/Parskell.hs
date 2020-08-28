@@ -24,4 +24,3 @@ parseAndEval :: Text -> Maybe Double
 parseAndEval formula = 
     Parskell.ExpressionTree.Parser.parseExpression formula 
     >>= Parskell.ExpressionTree.Evaluation.eval
-    
