@@ -1,4 +1,4 @@
-module Parskell.ExpressionTree.Parser where
+module Parskell.ExpressionTree.Parser (parseExpression) where
 
 import Data.Text
 import Text.Read
@@ -22,16 +22,16 @@ hideThingsInParentheses =
 
 
 splitOnAndParse :: BinaryOperator -> Text -> Maybe Expression
-splitOnAndParse operator text = 
+splitOnAndParse operator formula = 
     let operatorText = binaryOperator2Text operator
         length = Data.Text.length
                . Data.Text.intercalate operatorText
                . Prelude.init
                . splitOn operatorText 
                . hideThingsInParentheses 
-               $ text
-        left = Data.Text.take length text
-        right = Data.Text.drop (length + Data.Text.length operatorText) text
+               $ formula
+        left = Data.Text.take length formula
+        right = Data.Text.drop (length + Data.Text.length operatorText) formula
     in do 
         leftExpression <- parseExpression left
         rightExpression <- parseExpression right
