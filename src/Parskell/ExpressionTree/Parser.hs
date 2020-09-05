@@ -8,9 +8,10 @@ import Parskell.ExpressionTree.Conversion
 import Debug.Trace
 
 
-
-readMaybeUnpack :: Text -> Maybe Double
-readMaybeUnpack = readMaybe . Data.Text.unpack
+readMaybeFloatUnpack :: Text -> Maybe Double
+readMaybeFloatUnpack = readMaybe . Data.Text.unpack
+readMaybeIntegerUnpack :: Text -> Maybe Integer
+readMaybeIntegerUnpack = readMaybe . Data.Text.unpack
 
 
 
@@ -70,8 +71,13 @@ parseExpression formula
     | trimmedFormula `shouldSplitOn` Data.Text.pack "-" = splitOnAndParse Subtraction trimmedFormula
     | trimmedFormula `shouldSplitOn` Data.Text.pack "*" = splitOnAndParse Multiplication trimmedFormula
     | trimmedFormula `shouldSplitOn` Data.Text.pack "/" = splitOnAndParse Division trimmedFormula
-    where trimmedFormula = trimParentheses formula
-           
+    where trimmedFormula = strip . trimParentheses . strip $ formula
+
+parseExpression const 
+    | 'i' == (Data.Text.last . toLower $ const) = do 
+        value <- readMaybeIntegerUnpack . trimParentheses . Data.Text.init $ const :: Maybe Integer
+        return (Const (ConstantInteger { valueInteger = value }))
+
 parseExpression const = do 
-    value <- readMaybeUnpack . trimParentheses $ const
-    return (Const (Constant { value = value }))
+    value <- readMaybeFloatUnpack . trimParentheses $ const
+    return (Const (ConstantFloat { valueFloat = value }))
