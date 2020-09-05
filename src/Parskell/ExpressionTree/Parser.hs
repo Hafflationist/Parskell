@@ -5,6 +5,8 @@ import Text.Read
 import Parskell.ExpressionTree
 import Parskell.ExpressionTree.Conversion
 
+import Debug.Trace
+
 
 
 readMaybeUnpack :: Text -> Maybe Double
@@ -32,6 +34,7 @@ splitOnAndParse operator formula =
                $ formula
         left = Data.Text.take length formula
         right = Data.Text.drop (length + Data.Text.length operatorText) formula
+--        right = trace ((show left) ++ " | " ++ (show (Data.Text.drop (length + Data.Text.length operatorText) formula))) (Data.Text.drop (length + Data.Text.length operatorText) formula)
     in do 
         leftExpression <- parseExpression left
         rightExpression <- parseExpression right
@@ -43,8 +46,15 @@ trimParentheses :: Text -> Text
 trimParentheses text = 
     let head = Data.Text.head text
         last = Data.Text.last text
-    in if (head == '(') && (last == ')')
-       then Data.Text.init . Data.Text.tail $ text
+        shouldTrim = Data.Text.null 
+                   . Data.Text.strip 
+                   . hideThingsInParentheses 
+                   $ text
+    in if (head == '(') && (last == ')' && shouldTrim)
+       then trimParentheses 
+          . Data.Text.init 
+          . Data.Text.tail 
+          $ text
        else text
 
 
