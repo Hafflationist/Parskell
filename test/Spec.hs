@@ -1,2 +1,10 @@
+import Test.Hspec
+import Test.QuickCheck
+import Control.Exception (evaluate)
+import ParskellTest.ExpressionTree.ParserTest
+
+
 main :: IO ()
-main = putStrLn "Test suite not yet implemented"
+main = hspec $ do
+           describe "ParskellTest.ExpressionTree" $ do
+               describe "ParserTest" $ ParskellTest.ExpressionTree.ParserTest.parskellTest
