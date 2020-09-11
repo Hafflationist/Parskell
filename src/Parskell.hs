@@ -1,8 +1,8 @@
 module Parskell where
 
-import System.IO
 import Data.Maybe
 import Data.Text
+import System.IO
 import Parskell.ExpressionTree.Evaluation
 import Parskell.ExpressionTree.Parser
 
