@@ -7,4 +7,4 @@ import ParskellTest.ExpressionTree.ParserTest
 main :: IO ()
 main = hspec $ do
            describe "ParskellTest.ExpressionTree" $ do
-               describe "ParserTest" $ ParskellTest.ExpressionTree.ParserTest.parskellTest
+               describe "ParserTest" ParskellTest.ExpressionTree.ParserTest.parskellTest
