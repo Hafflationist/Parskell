@@ -32,6 +32,10 @@ lexerTest = do
                 let token = Literal {content = Data.Text.pack "hugo"}
                 Parskell.Lexing.Lexer.lexingWord word @?= Right [token]
                 
+            it "returns a simple token (Literal string fail)" $ do
+                let word = Data.Text.pack "\"hugo"
+                (Data.Either.isLeft . Parskell.Lexing.Lexer.lexingWord $ word) @?= True
+                
             it "returns a simple token (Operator)" $ do
                 let word = Data.Text.pack "|>"
                 let token = Operator {name = Data.Text.pack "|>"}

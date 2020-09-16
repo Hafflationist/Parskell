@@ -51,7 +51,7 @@ disassemble (character : word) acc
     | otherwise = return acc
     
 disassembleLiteralString :: [Char] -> [Char] -> [Token] -> Either String [Token]
-disassembleLiteralString hint [] acc = Left ("'" ++ hint ++ "' has no does not terminate properly!")
+disassembleLiteralString hint [] acc = Left ("'\"" ++ hint ++ "' does not terminate properly!")
 disassembleLiteralString hint (character : word) acc =
     if character == '"'
     then disassemble word (acc ++ [Literal {content = Data.Text.pack hint}])
