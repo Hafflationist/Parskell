@@ -1,25 +1,28 @@
 module Parskell where
 
+import Data.Either
+import Data.Either.Combinators
 import Data.Maybe
 import Data.Text
 import System.IO
 import Parskell.ExpressionTree.Evaluation
 import Parskell.ExpressionTree.Parser
+import Parskell.Lexing.Lexer
 
 
 calcIo = do putStrLn "Formula:"
             hFlush stdout
             input <- getLine
             let maybeResult = calcChar input
-            defaultReturn (maybeResult 
-                           >>= (\ char -> Just . putStrLn $ ("Result calculated by Parskell: " ++ show char)))
+            let e = maybeResult >>= (\ char -> Right . putStrLn $ ("Result calculated by Parskell: " ++ show char))
+            either (\ _ -> putStrLn "Input code not be parsed!") id e
          where 
              calcChar = parseAndEval . Data.Text.pack
-             defaultReturn = fromMaybe . putStrLn $ "Input code not be parsed!"
              
              
              
-parseAndEval :: Text -> Maybe Double
+parseAndEval :: Text -> Either [String] Double
 parseAndEval formula = 
-    Parskell.ExpressionTree.Parser.parseExpression formula 
+    Parskell.Lexing.Lexer.lexingWithoutLines formula
+    >>= Parskell.ExpressionTree.Parser.parseExpression 
     >>= Parskell.ExpressionTree.Evaluation.eval

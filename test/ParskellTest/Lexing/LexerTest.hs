@@ -80,6 +80,17 @@ lexerTest = do
                              ]
                 Parskell.Lexing.Lexer.lexingWithoutLines line @?= Right tokens
                 
+        it "returns a simple token ((alpha    >>= beta))" $ do
+                let line = Data.Text.pack "(alpha    >>= beta)"
+                let tokens = [
+                             RoundBracketOpen,
+                             Identifier {name = Data.Text.pack "alpha"}, 
+                             Operator {name = Data.Text.pack ">>="}, 
+                             Identifier {name = Data.Text.pack "beta"},
+                             RoundBracketClose
+                             ]
+                Parskell.Lexing.Lexer.lexingWithoutLines line @?= Right tokens
+                
         it "returns a simple token (let a <- 0 in a ** 20i)" $ do
                 let line = Data.Text.pack "let a <- 0 in a ** 20i"
                 let tokens = [

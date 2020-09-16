@@ -25,6 +25,7 @@ dependencies:
 - hspec
 - QuickCheck
 - HUnit
+- either
 library:
   source-dirs: src
 

@@ -1,9 +1,13 @@
 module Parskell.ExpressionTree.Parser (parseExpression) where
 
+import Data.Either
+import Data.Either.Combinators
+import Data.List
 import Data.Text
 import Text.Read
 import Parskell.ExpressionTree
 import Parskell.ExpressionTree.Conversion
+import Parskell.Lexing.Tokens
 
 import Debug.Trace
 
@@ -15,74 +19,71 @@ readMaybeIntegerUnpack = readMaybe . Data.Text.unpack
 
 
 
-hideThingsInParentheses :: Text -> Text
+hideThingsInParentheses :: [Token] -> [Token]
 hideThingsInParentheses =
-    let mapper count '(' = (count + 1, ' ')
-        mapper count ')' = (count - 1, ' ')
-        mapper count character = (count, if count == 0 then character else ' ')
-    in snd . Data.Text.mapAccumL mapper 0
+    let mapper count RoundBracketOpen = (count + 1, Ignore)
+        mapper count RoundBracketClose = (count - 1, Ignore)
+        mapper count character = (count, if count == 0 then character else Ignore)
+    in snd . Data.List.mapAccumL mapper 0
 
 
 
-splitOnAndParse :: BinaryOperator -> Text -> Maybe Expression
-splitOnAndParse operator formula = 
+splitOnAndParse :: BinaryOperator -> [Token] -> Either [String] Expression
+splitOnAndParse operator tokens = 
     let operatorText = binaryOperator2Text operator
-        length = Data.Text.length
-               . Data.Text.intercalate operatorText
-               . Prelude.init
-               . splitOn operatorText 
-               . hideThingsInParentheses 
-               $ formula
-        left = Data.Text.take length formula
-        right = Data.Text.drop (length + Data.Text.length operatorText) formula
---        right = trace ((show left) ++ " | " ++ (show (Data.Text.drop (length + Data.Text.length operatorText) formula))) (Data.Text.drop (length + Data.Text.length operatorText) formula)
-    in do 
+    in do
+        indexOfOperatorReverse <- maybeToRight ["Internal parser error! Operator not found!"]
+                         . elemIndex (Parskell.Lexing.Tokens.Operator {name = operatorText})
+                         . Data.List.reverse
+                         . hideThingsInParentheses 
+                         $ tokens
+        let indexOfOperator = Data.List.length tokens - 1 - indexOfOperatorReverse
+        let left = Data.List.take indexOfOperator tokens
+        let right = Data.List.drop (indexOfOperator + 1) tokens
+--        let right = trace ((show left) ++ " | " ++ (show (Data.List.drop (indexOfOperator + 1) tokens))) (Data.List.drop (indexOfOperator + 1) tokens)
         leftExpression <- parseExpression left
         rightExpression <- parseExpression right
         return (Op2 (Operator2 {binaryOperator = operator, expression1 = leftExpression, expression2 = rightExpression}))
 
 
 
-trimParentheses :: Text -> Text
-trimParentheses text = 
-    let head = Data.Text.head text
-        last = Data.Text.last text
-        shouldTrim = Data.Text.null 
-                   . Data.Text.strip 
-                   . hideThingsInParentheses 
-                   $ text
-    in if (head == '(') && (last == ')' && shouldTrim)
+trimParentheses :: [Token] -> [Token]
+trimParentheses tokens = 
+    let head = Data.List.head tokens
+        last = Data.List.last tokens
+        shouldTrim = (not . Data.List.any (/= Ignore) . hideThingsInParentheses) tokens
+    in if (head == RoundBracketOpen) && (last == RoundBracketClose && shouldTrim)
        then trimParentheses 
-          . Data.Text.init 
-          . Data.Text.tail 
-          $ text
-       else text
+          . Data.List.init 
+          . Data.List.tail 
+          $ tokens
+       else tokens
 
 
 
-shouldSplitOn :: Text -> Text -> Bool
-shouldSplitOn formula operator = operator `isInfixOf` hideThingsInParentheses formula
+shouldSplitOn :: [Token] -> Token -> Bool
+shouldSplitOn tokens operator = operator `elem` hideThingsInParentheses tokens
 
 
 
-parseExpression :: Text -> Maybe Expression
-parseExpression formula
-    | trimmedFormula `shouldSplitOn` Data.Text.pack "+" = splitOnAndParse Addition trimmedFormula
-    | trimmedFormula `shouldSplitOn` Data.Text.pack "-" = splitOnAndParse Subtraction trimmedFormula
-    | trimmedFormula `shouldSplitOn` Data.Text.pack "*" = splitOnAndParse Multiplication trimmedFormula
-    | trimmedFormula `shouldSplitOn` Data.Text.pack "/" = splitOnAndParse Division trimmedFormula
-    where trimmedFormula = strip 
-                         . trimParentheses 
-                         . strip 
-                         $ formula
+parseExpression :: [Token] -> Either [String] Expression
+parseExpression tokens
+    | trimmedTokens `shouldSplitOn` operatorToken "+" = splitOnAndParse Addition trimmedTokens
+    | trimmedTokens `shouldSplitOn` operatorToken "-" = splitOnAndParse Subtraction trimmedTokens
+    | trimmedTokens `shouldSplitOn` operatorToken "*" = splitOnAndParse Multiplication trimmedTokens
+    | trimmedTokens `shouldSplitOn` operatorToken "/" = splitOnAndParse Division trimmedTokens
+    where operatorToken op = Parskell.Lexing.Tokens.Operator { name = Data.Text.pack op}
+          filterIgnore = Data.List.filter (/= Ignore)
+          trimmedTokens = filterIgnore 
+                        . trimParentheses 
+                        . filterIgnore 
+                        $ tokens
 
-parseExpression const 
-    | 'i' == (Data.Text.last . toLower $ const) = do 
-        value <- readMaybeIntegerUnpack . trimParentheses . Data.Text.init $ const :: Maybe Integer
-        return (Const (ConstantInteger { valueInteger = value }))
-
-parseExpression const = do 
-    value <- readMaybeFloatUnpack 
-           . trimParentheses 
-           $ const
+parseExpression tokens = parseExpressionConst . trimParentheses $ tokens
+    
+parseExpressionConst [Parskell.Lexing.Tokens.Literal {content = c}] = do
+    value <- maybeToRight ["Could not parse float: " ++ Data.Text.unpack c]
+           . readMaybeFloatUnpack 
+           $ c
     return (Const (ConstantFloat { valueFloat = value }))
+    
