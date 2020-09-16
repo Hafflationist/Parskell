@@ -71,7 +71,10 @@ parseExpression formula
     | trimmedFormula `shouldSplitOn` Data.Text.pack "-" = splitOnAndParse Subtraction trimmedFormula
     | trimmedFormula `shouldSplitOn` Data.Text.pack "*" = splitOnAndParse Multiplication trimmedFormula
     | trimmedFormula `shouldSplitOn` Data.Text.pack "/" = splitOnAndParse Division trimmedFormula
-    where trimmedFormula = strip . trimParentheses . strip $ formula
+    where trimmedFormula = strip 
+                         . trimParentheses 
+                         . strip 
+                         $ formula
 
 parseExpression const 
     | 'i' == (Data.Text.last . toLower $ const) = do 
@@ -79,5 +82,7 @@ parseExpression const
         return (Const (ConstantInteger { valueInteger = value }))
 
 parseExpression const = do 
-    value <- readMaybeFloatUnpack . trimParentheses $ const
+    value <- readMaybeFloatUnpack 
+           . trimParentheses 
+           $ const
     return (Const (ConstantFloat { valueFloat = value }))
