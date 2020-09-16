@@ -9,6 +9,7 @@ import Test.Hspec
 import Test.HUnit
 import Test.QuickCheck
 
+
 lexerTest = do
     describe "Single words" $ do
         describe "Single" $ do
