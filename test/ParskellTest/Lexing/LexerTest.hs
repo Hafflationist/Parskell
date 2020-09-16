@@ -68,7 +68,7 @@ lexerTest = do
                              ]
                 Parskell.Lexing.Lexer.lexingWord word @?= Right tokens
 
-    describe "Multipile words" $ do
+    describe "Multiple words" $ do
         it "returns a simple token ((alpha >>= beta))" $ do
                 let line = Data.Text.pack "(alpha >>= beta)"
                 let tokens = [
@@ -78,7 +78,7 @@ lexerTest = do
                              Identifier {name = Data.Text.pack "beta"},
                              RoundBracketClose
                              ]
-                Parskell.Lexing.Lexer.lexing line @?= Right tokens
+                Parskell.Lexing.Lexer.lexingWithoutLines line @?= Right tokens
                 
         it "returns a simple token (let a <- 0 in a ** 20i)" $ do
                 let line = Data.Text.pack "let a <- 0 in a ** 20i"
@@ -92,7 +92,7 @@ lexerTest = do
                              Operator {name = Data.Text.pack "**"}, 
                              Literal {content = Data.Text.pack "20i"}
                              ]
-                Parskell.Lexing.Lexer.lexing line @?= Right tokens
+                Parskell.Lexing.Lexer.lexingWithoutLines line @?= Right tokens
                 
         it "returns a simple token ([let a <- 0 in a ** 20i])" $ do
                 let line = Data.Text.pack "[let a <- 0 in a ** 20i]"
@@ -107,5 +107,34 @@ lexerTest = do
                              Operator {name = Data.Text.pack "**"}, 
                              Literal {content = Data.Text.pack "20i"},
                              SquareBracketClose
+                             ]
+                Parskell.Lexing.Lexer.lexingWithoutLines line @?= Right tokens
+                
+    describe "Multiple words with line count" $ do
+        it "returns a simple token ((alpha >>= beta))" $ do
+                let line = Data.Text.pack "(alpha \n\
+                                          \ >>= beta)"
+                let tokens = [
+                             (1, RoundBracketOpen),
+                             (1, Identifier {name = Data.Text.pack "alpha"}), 
+                             (2, Operator {name = Data.Text.pack ">>="}),
+                             (2, Identifier {name = Data.Text.pack "beta"}),
+                             (2, RoundBracketClose)
+                             ]
+                Parskell.Lexing.Lexer.lexing line @?= Right tokens
+                
+        it "returns a simple token (let a <- 0 in a ** 20i)" $ do
+                let line = Data.Text.pack "let \n\
+                                          \a <- 0 \n\
+                                          \in a ** 20i"
+                let tokens = [
+                             (1, Let),
+                             (2, Identifier {name = Data.Text.pack "a"}),
+                             (2, Operator {name = Data.Text.pack "<-"}), 
+                             (2, Literal {content = Data.Text.pack "0"}),
+                             (3, In),
+                             (3, Identifier {name = Data.Text.pack "a"}),
+                             (3, Operator {name = Data.Text.pack "**"}),
+                             (3, Literal {content = Data.Text.pack "20i"})
                              ]
                 Parskell.Lexing.Lexer.lexing line @?= Right tokens

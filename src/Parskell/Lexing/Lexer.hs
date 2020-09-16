@@ -1,5 +1,8 @@
-module Parskell.Lexing.Lexer (lexing, lexingWord) where
+{-# LANGUAGE TupleSections #-}
 
+module Parskell.Lexing.Lexer (lexing, lexingWord, lexingWithoutLines) where
+
+import Data.Bifunctor
 import Data.Either
 import Data.List
 import Data.Text
@@ -95,10 +98,26 @@ lexingWord word
 
 
 
-lexing :: Text -> Either [String] [Token]
-lexing input = 
+lexingWithoutLines :: Text -> Either [String] [Token]
+lexingWithoutLines input = 
     let words = Data.Text.lines input >>= Data.Text.words
         (lefts, rights) = Data.Either.partitionEithers . fmap lexingWord $ words 
     in if Prelude.null lefts 
     then Right (Prelude.concat rights)
-    else Left lefts    
+    else Left lefts
+    
+    
+
+lexing :: Text -> Either [(Integer, String)] [(Integer, Token)]
+lexing input = 
+    let counter = [1..]
+        lines = Data.Text.lines input
+        linesWithCount = Data.List.zip counter lines
+        words = linesWithCount >>= (\ (count, line) -> fmap (count,) . Data.Text.words $ line)
+        (lefts, rights) = Data.Either.partitionEithers 
+                        . fmap ((\ (c, either) -> Data.Bifunctor.bimap (c,) (c,) either) 
+                             . Data.Bifunctor.second lexingWord) 
+                        $ words 
+    in if Prelude.null lefts 
+    then Right (rights >>= (\ (c, tokens) -> (c,) <$> tokens))
+    else Left lefts   
