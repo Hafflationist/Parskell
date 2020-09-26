@@ -127,7 +127,8 @@ lexerTest = do
                                           \ >>= beta)"
                 let tokens = [
                              (1, RoundBracketOpen),
-                             (1, Identifier {name = Data.Text.pack "alpha"}), 
+                             (1, Identifier {name = Data.Text.pack "alpha"}),
+                             (1, Newline),
                              (2, Operator {name = Data.Text.pack ">>="}),
                              (2, Identifier {name = Data.Text.pack "beta"}),
                              (2, RoundBracketClose)
@@ -140,9 +141,11 @@ lexerTest = do
                                           \in a ** 20i"
                 let tokens = [
                              (1, Let),
+                             (1, Newline),
                              (2, Identifier {name = Data.Text.pack "a"}),
                              (2, Operator {name = Data.Text.pack "<-"}), 
                              (2, Literal {content = Data.Text.pack "0"}),
+                             (2, Newline),
                              (3, In),
                              (3, Identifier {name = Data.Text.pack "a"}),
                              (3, Operator {name = Data.Text.pack "**"}),

@@ -1,7 +1,6 @@
 module Parskell.ExpressionTree (
     Expression(..), 
-    BinaryOperator(..), 
-    Operation2(..), 
+    BinaryOperator(..),
     Operator(..), 
     Constant(..), 
     TType(..)) where
@@ -21,27 +20,10 @@ data Constant
 instance Eq Constant where
     (==) ConstantFloat {valueFloat = a} ConstantFloat {valueFloat = b} = a == b
     (==) ConstantInteger {valueInteger = a} ConstantInteger {valueInteger = b} = a == b 
+    (==) _ _ = False
 instance Show Constant where
     show ConstantFloat {valueFloat = a} = "(" ++ show a ++ ")" 
     show ConstantInteger {valueInteger = a} = "(" ++ show a ++ ")" 
-
-data Operation1 = Operator1 {unaryOperator :: UnaryOperator, expression :: Expression}
-instance Eq Operation1 where
-    (==) Operator1 {unaryOperator = op1, expression = a1} 
-         Operator1 {unaryOperator = op2, expression = a2} = 
-         op1 == op2 && a1 == a2
-instance Show Operation1 where
-    show Operator1 {unaryOperator = op, expression = a} = "(" ++ show op ++ " " ++ show a ++ ")"
-    
-    
-data Operation2 = Operator2 {binaryOperator :: BinaryOperator, expression1 :: Expression, expression2 :: Expression}
-instance Eq Operation2 where
-    (==) Operator2 {binaryOperator = op1, expression1 = a11, expression2 = a21} 
-         Operator2 {binaryOperator = op2, expression1 = a12, expression2 = a22} =
-         op1 == op2 && a11 == a12 && a21 == a22
-instance Show Operation2 where
-    show Operator2 {binaryOperator = op, expression1 = a1, expression2 = a2} = 
-        "(" ++ show a1 ++ " " ++ show op ++ " " ++ show a2 ++ ")"
     
     
 data Operator 
@@ -86,14 +68,22 @@ instance Show BinaryOperator where
 
 data Expression 
     = Const Constant
-    | Op1 Operation1
-    | Op2 Operation2
+    | Operation1 {unaryOperator :: UnaryOperator, expression :: Expression}
+    | Operation2 {binaryOperator :: BinaryOperator, expression1 :: Expression, expression2 :: Expression}
+    | DoExpression {statements :: [Text], expression :: Expression}
 instance Eq Expression where
     (==) (Const a1) (Const a2) = a1 == a2
-    (==) (Op1 a1) (Op1 a2) = a1 == a2
-    (==) (Op2 a1) (Op2 a2) = a1 == a2
+    (==) Operation1 {unaryOperator = op1, expression = a1} 
+         Operation1 {unaryOperator = op2, expression = a2} = 
+         op1 == op2 && a1 == a2
+    (==) Operation2 {binaryOperator = op1, expression1 = a11, expression2 = a21} 
+         Operation2 {binaryOperator = op2, expression1 = a12, expression2 = a22} =
+         op1 == op2 && a11 == a12 && a21 == a22
     (==) _ _ = False
 instance Show Expression where
     show (Const a) = show a
-    show (Op1 a) = show a
-    show (Op2 a) = show a
+    show Operation1 {unaryOperator = op, expression = a} = "(" ++ show op ++ " " ++ show a ++ ")"
+    show Operation2 {binaryOperator = op, expression1 = a1, expression2 = a2} = 
+        "(" ++ show a1 ++ " " ++ show op ++ " " ++ show a2 ++ ")"
+    show DoExpression {statements = _, expression = expr} =
+        " (do " ++ show expr ++ "done) "

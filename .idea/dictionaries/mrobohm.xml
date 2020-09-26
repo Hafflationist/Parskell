@@ -4,8 +4,10 @@
       <w>accum</w>
       <w>bifunctor</w>
       <w>bimap</w>
+      <w>eith</w>
       <w>parskell</w>
       <w>system.io</w>
+      <w>unop</w>
     </words>
   </dictionary>
 </component>

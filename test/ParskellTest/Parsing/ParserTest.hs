@@ -1,15 +1,11 @@
 module ParskellTest.Parsing.ParserTest where
 
-import Control.Exception (evaluate)
-import Data.Either
 import Data.Text
 import Parskell.Parsing.Parser
 import Parskell.ExpressionTree
-import Parskell.Lexing.Lexer
 import Parskell.Lexing.Tokens
 import Test.Hspec
 import Test.HUnit
-import Test.QuickCheck
 
 
 parskellTest = do
@@ -19,7 +15,7 @@ parskellTest = do
                         Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "+"},
                         Literal {content = Data.Text.pack "1"}
                      ] -- 1+1
-        let expressionTree = Op2 Operator2 {
+        let expressionTree = Parskell.ExpressionTree.Operation2 {
             binaryOperator = Addition, 
             expression1 = Const ConstantFloat {valueFloat = 1.0}, 
             expression2 = Const ConstantFloat {valueFloat = 1.0}
@@ -32,7 +28,7 @@ parskellTest = do
                         Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "-"},
                         Literal {content = Data.Text.pack "1"}
                      ] -- 1-1
-        let expressionTree = Op2 Operator2 {
+        let expressionTree = Operation2 {
             binaryOperator = Subtraction, 
             expression1 = Const ConstantFloat {valueFloat = 1.0}, 
             expression2 = Const ConstantFloat {valueFloat = 1.0}
@@ -45,7 +41,7 @@ parskellTest = do
                         Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "*"},
                         Literal {content = Data.Text.pack "1"}
                      ] -- 1*1
-        let expressionTree = Op2 Operator2 {
+        let expressionTree = Operation2 {
             binaryOperator = Multiplication, 
             expression1 = Const ConstantFloat {valueFloat = 1.0}, 
             expression2 = Const ConstantFloat {valueFloat = 1.0}
@@ -58,7 +54,7 @@ parskellTest = do
                         Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "/"},
                         Literal {content = Data.Text.pack "1"}
                      ] -- 1/1
-        let expressionTree = Op2 Operator2 {
+        let expressionTree = Operation2 {
             binaryOperator = Division, 
             expression1 = Const ConstantFloat {valueFloat = 1.0}, 
             expression2 = Const ConstantFloat {valueFloat = 1.0}
@@ -73,12 +69,12 @@ parskellTest = do
                         Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "+"},
                         Literal {content = Data.Text.pack "3"}
                      ] -- 1+2+3
-        let firstCalc = Op2 Operator2 {
+        let firstCalc = Operation2 {
             binaryOperator = Addition, 
             expression1 = Const ConstantFloat {valueFloat = 1.0}, 
             expression2 = Const ConstantFloat {valueFloat = 2.0}
         }
-        let expressionTree = Op2 Operator2 {
+        let expressionTree = Operation2 {
             binaryOperator = Addition, 
             expression1 = firstCalc, 
             expression2 = Const ConstantFloat {valueFloat = 3.0}
@@ -95,18 +91,17 @@ parskellTest = do
                         Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "+"},
                         Literal {content = Data.Text.pack "4"}
                      ] -- 1+2*3+4
-        let formula = Data.Text.pack "1+2*3+4"
-        let middleCalc = Op2 Operator2 {
+        let middleCalc = Operation2 {
             binaryOperator = Multiplication, 
             expression1 = Const ConstantFloat {valueFloat = 2.0}, 
             expression2 = Const ConstantFloat {valueFloat = 3.0}
         }
-        let leftCalc = Op2 Operator2 {
+        let leftCalc = Operation2 {
             binaryOperator = Addition, 
             expression1 = Const ConstantFloat {valueFloat = 1.0}, 
             expression2 = middleCalc
         }
-        let expressionTree = Op2 Operator2 {
+        let expressionTree = Operation2 {
             binaryOperator = Addition, 
             expression1 = leftCalc, 
             expression2 = Const ConstantFloat {valueFloat = 4.0}
@@ -125,17 +120,17 @@ parskellTest = do
                         Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "+"},
                         Literal {content = Data.Text.pack "5"}
                      ] -- 2+(3+4)+5
-        let middleCalc = Op2 Operator2 {
+        let middleCalc = Operation2 {
             binaryOperator = Addition, 
             expression1 = Const ConstantFloat {valueFloat = 3.0}, 
             expression2 = Const ConstantFloat {valueFloat = 4.0}
         }
-        let leftCalc = Op2 Operator2 {
+        let leftCalc = Operation2 {
             binaryOperator = Addition, 
             expression1 = Const ConstantFloat {valueFloat = 2.0}, 
             expression2 = middleCalc
         }
-        let expressionTree = Op2 Operator2 {
+        let expressionTree = Operation2 {
             binaryOperator = Addition, 
             expression1 = leftCalc, 
             expression2 = Const ConstantFloat {valueFloat = 5.0}
@@ -154,18 +149,17 @@ parskellTest = do
                         Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "*"},
                         Literal {content = Data.Text.pack "4"}
                      ] -- 1*(6+7)*4
-        let formula = Data.Text.pack "1*(6+7)*4"
-        let middleCalc = Op2 Operator2 {
+        let middleCalc = Operation2 {
             binaryOperator = Addition, 
             expression1 = Const ConstantFloat {valueFloat = 6.0}, 
             expression2 = Const ConstantFloat {valueFloat = 7.0}
         }
-        let leftCalc = Op2 Operator2 {
+        let leftCalc = Operation2 {
             binaryOperator = Multiplication, 
             expression1 = Const ConstantFloat {valueFloat = 1.0}, 
             expression2 = middleCalc
         }
-        let expressionTree = Op2 Operator2 {
+        let expressionTree = Operation2 {
             binaryOperator = Multiplication, 
             expression1 = leftCalc, 
             expression2 = Const ConstantFloat {valueFloat = 4.0}
@@ -192,12 +186,12 @@ parskellTest = do
                         RoundBracketClose,
                         Ignore
                      ] --    1  *  (  6  +  7   )   
-        let middleCalc = Op2 Operator2 {
+        let middleCalc = Operation2 {
             binaryOperator = Addition, 
             expression1 = Const ConstantFloat {valueFloat = 6.0}, 
             expression2 = Const ConstantFloat {valueFloat = 7.0}
         }
-        let expressionTree = Op2 Operator2 {
+        let expressionTree = Operation2 {
             binaryOperator = Multiplication, 
             expression1 = Const ConstantFloat {valueFloat = 1.0}, 
             expression2 = middleCalc
@@ -216,7 +210,7 @@ parskellTest = do
                         RoundBracketClose,
                         RoundBracketClose
                      ] -- (((1+1)))
-        let expressionTree = Op2 Operator2 {
+        let expressionTree = Operation2 {
             binaryOperator = Addition, 
             expression1 = Const ConstantFloat {valueFloat = 1.0}, 
             expression2 = Const ConstantFloat {valueFloat = 1.0}
@@ -237,17 +231,17 @@ parskellTest = do
                         Literal {content = Data.Text.pack "4"},
                         RoundBracketClose
                      ] -- (1/2)/(3/4)
-        let leftCalc = Op2 Operator2 {
+        let leftCalc = Operation2 {
             binaryOperator = Division, 
             expression1 = Const ConstantFloat {valueFloat = 1.0}, 
             expression2 = Const ConstantFloat {valueFloat = 2.0}
         }
-        let rightCalc = Op2 Operator2 {
+        let rightCalc = Operation2 {
             binaryOperator = Division, 
             expression1 = Const ConstantFloat {valueFloat = 3.0}, 
             expression2 = Const ConstantFloat {valueFloat = 4.0}
         }
-        let expressionTree = Op2 Operator2 {
+        let expressionTree = Operation2 {
             binaryOperator = Division, 
             expression1 = leftCalc, 
             expression2 = rightCalc

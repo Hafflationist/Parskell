@@ -113,13 +113,14 @@ lexingWithoutLines input =
 lexing :: Text -> Either [(Integer, String)] [(Integer, Token)]
 lexing input = 
     let counter = [1..]
-        lines = Data.Text.lines input
-        linesWithCount = Data.List.zip counter lines
-        words = linesWithCount >>= (\ (count, line) -> fmap (count,) . Data.Text.words $ line)
-        (lefts, rights) = Data.Either.partitionEithers 
-                        . fmap ((\ (c, either) -> Data.Bifunctor.bimap (c,) (c,) either) 
+        inputLines = Data.Text.lines input
+        linesWithCount = Data.List.zip counter inputLines
+        inputWords = linesWithCount >>= (\ (countNum, line) -> fmap (countNum,) . Data.Text.words $ line)
+        (errors, niceTokens) = Data.Either.partitionEithers
+--                        . Data.List.foldl (\ acc (line, token) -> ) (1, Ignore) 
+                        . fmap ((\ (c, eith) -> Data.Bifunctor.bimap (c,) (c,) eith) 
                              . Data.Bifunctor.second lexingWord) 
-                        $ words 
-    in if Prelude.null lefts 
-    then Right (rights >>= (\ (c, tokens) -> (c,) <$> tokens))
-    else Left lefts
+                        $ inputWords 
+    in if Prelude.null errors 
+    then Right (niceTokens >>= (\ (c, tokens) -> (c,) <$> tokens))
+    else Left errors

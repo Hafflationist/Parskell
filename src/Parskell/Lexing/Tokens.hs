@@ -11,9 +11,12 @@ data Token
     | Literal {content :: Text}
     | Let
     | In
+    | Return
     | Do
     | Done
     | Operator {name :: Text}
+    | Semicolon
+    | Newline
     | Ignore   
 instance Eq Token where
     (==) RoundBracketOpen RoundBracketOpen = True
@@ -25,8 +28,11 @@ instance Eq Token where
     (==) Let Let = True
     (==) In In = True
     (==) Do Do = True
+    (==) Return Return = True
     (==) Done Done = True
     (==) Operator {name = n1} Operator {name = n2} = n1 == n2
+    (==) Semicolon Semicolon = True
+    (==) Newline Newline = True
     (==) Ignore Ignore = True
     (==) _ _ = False
 instance Show Token where
@@ -36,9 +42,12 @@ instance Show Token where
     show SquareBracketClose = "]"
     show Identifier {name = n} = " " ++ Data.Text.unpack n ++ " <i> "
     show Literal {content = c} = " " ++ Data.Text.unpack c ++ " <l> "
-    show Let = "let"
-    show In = "in"
-    show Do = "do"
-    show Done = "done"
+    show Let = " let "
+    show In = " in "
+    show Return = " return "
+    show Do = " do "
+    show Done = " done "
     show Operator {name = n} = " " ++ Data.Text.unpack n ++ " <o> "
+    show Semicolon = "; "
+    show Newline = "<\\n> "
     show Ignore = "<ignore>"
