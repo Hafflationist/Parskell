@@ -1,9 +1,9 @@
-module ParskellTest.ExpressionTree.ParserTest where
+module ParskellTest.Parsing.ParserTest where
 
 import Control.Exception (evaluate)
 import Data.Either
 import Data.Text
-import Parskell.ExpressionTree.Parser
+import Parskell.Parsing.Parser
 import Parskell.ExpressionTree
 import Parskell.Lexing.Lexer
 import Parskell.Lexing.Tokens
@@ -24,7 +24,7 @@ parskellTest = do
             expression1 = Const ConstantFloat {valueFloat = 1.0}, 
             expression2 = Const ConstantFloat {valueFloat = 1.0}
         }
-        Parskell.ExpressionTree.Parser.parseExpression tokens @?= Right expressionTree
+        Parskell.Parsing.Parser.parseExpression tokens @?= Right expressionTree
         
     it "returns a simple expression tree -" $ do
         let tokens = [
@@ -37,7 +37,7 @@ parskellTest = do
             expression1 = Const ConstantFloat {valueFloat = 1.0}, 
             expression2 = Const ConstantFloat {valueFloat = 1.0}
         }  
-        Parskell.ExpressionTree.Parser.parseExpression tokens @?= Right expressionTree
+        Parskell.Parsing.Parser.parseExpression tokens @?= Right expressionTree
         
     it "returns a simple expression tree *" $ do
         let tokens = [
@@ -50,7 +50,7 @@ parskellTest = do
             expression1 = Const ConstantFloat {valueFloat = 1.0}, 
             expression2 = Const ConstantFloat {valueFloat = 1.0}
         }  
-        Parskell.ExpressionTree.Parser.parseExpression tokens @?= Right expressionTree
+        Parskell.Parsing.Parser.parseExpression tokens @?= Right expressionTree
         
     it "returns a simple expression tree /" $ do
         let tokens = [
@@ -63,7 +63,7 @@ parskellTest = do
             expression1 = Const ConstantFloat {valueFloat = 1.0}, 
             expression2 = Const ConstantFloat {valueFloat = 1.0}
         }  
-        Parskell.ExpressionTree.Parser.parseExpression tokens @?= Right expressionTree
+        Parskell.Parsing.Parser.parseExpression tokens @?= Right expressionTree
         
     it "returns a simple expression tree with left2right" $ do
         let tokens = [
@@ -83,7 +83,7 @@ parskellTest = do
             expression1 = firstCalc, 
             expression2 = Const ConstantFloat {valueFloat = 3.0}
         }
-        Parskell.ExpressionTree.Parser.parseExpression tokens @?= Right expressionTree
+        Parskell.Parsing.Parser.parseExpression tokens @?= Right expressionTree
         
     it "returns a simple expression tree with precedence over left2right" $ do
         let tokens = [
@@ -111,7 +111,7 @@ parskellTest = do
             expression1 = leftCalc, 
             expression2 = Const ConstantFloat {valueFloat = 4.0}
         }
-        Parskell.ExpressionTree.Parser.parseExpression tokens @?= Right expressionTree
+        Parskell.Parsing.Parser.parseExpression tokens @?= Right expressionTree
         
     it "returns a simple expression tree with brackets over left2right" $ do
         let tokens = [
@@ -140,7 +140,7 @@ parskellTest = do
             expression1 = leftCalc, 
             expression2 = Const ConstantFloat {valueFloat = 5.0}
         }
-        Parskell.ExpressionTree.Parser.parseExpression tokens @?= Right expressionTree
+        Parskell.Parsing.Parser.parseExpression tokens @?= Right expressionTree
         
     it "returns a simple expression tree with brackets over precedence" $ do
         let tokens = [
@@ -170,7 +170,7 @@ parskellTest = do
             expression1 = leftCalc, 
             expression2 = Const ConstantFloat {valueFloat = 4.0}
         }
-        Parskell.ExpressionTree.Parser.parseExpression tokens @?= Right expressionTree
+        Parskell.Parsing.Parser.parseExpression tokens @?= Right expressionTree
         
     it "returns a simple expression tree with unnecessary ignore tokens" $ do
         let tokens = [
@@ -202,7 +202,7 @@ parskellTest = do
             expression1 = Const ConstantFloat {valueFloat = 1.0}, 
             expression2 = middleCalc
         }
-        Parskell.ExpressionTree.Parser.parseExpression tokens @?= Right expressionTree
+        Parskell.Parsing.Parser.parseExpression tokens @?= Right expressionTree
         
     it "returns a simple expression tree with unnecessary spaces" $ do
         let tokens = [
@@ -221,7 +221,7 @@ parskellTest = do
             expression1 = Const ConstantFloat {valueFloat = 1.0}, 
             expression2 = Const ConstantFloat {valueFloat = 1.0}
         }  
-        Parskell.ExpressionTree.Parser.parseExpression tokens @?= Right expressionTree
+        Parskell.Parsing.Parser.parseExpression tokens @?= Right expressionTree
         
     it "returns a simple expression tree with fake embracing brackets (with lexer preprocessing)" $ do
         let tokens = [
@@ -252,4 +252,4 @@ parskellTest = do
             expression1 = leftCalc, 
             expression2 = rightCalc
         }
-        Parskell.ExpressionTree.Parser.parseExpression tokens @?= Right expressionTree
+        Parskell.Parsing.Parser.parseExpression tokens @?= Right expressionTree

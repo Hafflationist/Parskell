@@ -1,4 +1,4 @@
-module Parskell.ExpressionTree.Parser (parseExpression) where
+module Parskell.Parsing.Parser (parseExpression) where
 
 import Data.Either
 import Data.Either.Combinators
@@ -33,10 +33,10 @@ splitOnAndParse operator tokens =
     let operatorText = binaryOperator2Text operator
     in do
         indexOfOperatorReverse <- maybeToRight ["Internal parser error! Operator not found!"]
-                         . elemIndex (Parskell.Lexing.Tokens.Operator {name = operatorText})
-                         . Data.List.reverse
-                         . hideThingsInParentheses 
-                         $ tokens
+                                . elemIndex (Parskell.Lexing.Tokens.Operator {name = operatorText})
+                                . Data.List.reverse
+                                . hideThingsInParentheses 
+                                $ tokens
         let indexOfOperator = Data.List.length tokens - 1 - indexOfOperatorReverse
         let left = Data.List.take indexOfOperator tokens
         let right = Data.List.drop (indexOfOperator + 1) tokens

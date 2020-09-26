@@ -5,8 +5,8 @@ import Data.Either.Combinators
 import Data.Maybe
 import Data.Text
 import System.IO
-import Parskell.ExpressionTree.Evaluation
-import Parskell.ExpressionTree.Parser
+import Parskell.Synthesis.Evaluation
+import Parskell.Parsing.Parser
 import Parskell.Lexing.Lexer
 
 
@@ -24,5 +24,5 @@ calcIo = do putStrLn "Formula:"
 parseAndEval :: Text -> Either [String] Double
 parseAndEval formula = 
     Parskell.Lexing.Lexer.lexingWithoutLines formula
-    >>= Parskell.ExpressionTree.Parser.parseExpression 
-    >>= Parskell.ExpressionTree.Evaluation.eval
+    >>= Parskell.Parsing.Parser.parseExpression 
+    >>= Parskell.Synthesis.Evaluation.eval

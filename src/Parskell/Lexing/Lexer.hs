@@ -9,7 +9,7 @@ import Data.Text
 import Parskell.Lexing.Tokens
 
 
-    
+
 operatorChars :: String
 operatorChars = ['!', '°', '^', '+', '-', '*', '/', '~', '?','<', '>','=', ':', '.', '|']
 numberChars :: String
@@ -28,9 +28,9 @@ isLiteral _ = False
 
 isIdentifier :: Text -> Bool
 isIdentifier _ = False
-    
-    
-    
+
+
+
 identifier2Keyword :: Token -> Token
 identifier2Keyword Identifier {name = n}
     | n == Data.Text.pack "let" = Let
@@ -52,7 +52,7 @@ disassemble (character : word) acc
     | character `elem` numberChars = disassembleNumber [character] word acc
     | character `elem` identifierChars = disassembleIdentifier [character] word acc
     | otherwise = return acc
-    
+
 disassembleLiteralString :: [Char] -> [Char] -> [Token] -> Either String [Token]
 disassembleLiteralString hint [] acc = Left ("'\"" ++ hint ++ "' does not terminate properly!")
 disassembleLiteralString hint (character : word) acc =
@@ -92,6 +92,8 @@ lexingWord :: Text -> Either String [Token]
 lexingWord word
     | "let" == Data.Text.unpack word = Right [Let]
     | "in" == Data.Text.unpack word = Right [In]
+    | "do" == Data.Text.unpack word = Right [Do]
+    | "done" == Data.Text.unpack word = Right [Done]
     | otherwise = disassembleInit 
                 . Data.Text.unpack 
                 $ word
@@ -105,8 +107,8 @@ lexingWithoutLines input =
     in if Prelude.null lefts 
     then Right (Prelude.concat rights)
     else Left lefts
-    
-    
+
+
 
 lexing :: Text -> Either [(Integer, String)] [(Integer, Token)]
 lexing input = 
@@ -120,4 +122,4 @@ lexing input =
                         $ words 
     in if Prelude.null lefts 
     then Right (rights >>= (\ (c, tokens) -> (c,) <$> tokens))
-    else Left lefts   
+    else Left lefts

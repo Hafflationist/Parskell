@@ -1,4 +1,4 @@
-module Parskell.ExpressionTree.Evaluation where
+module Parskell.Synthesis.Evaluation where
 
 import Parskell.ExpressionTree
 

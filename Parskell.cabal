@@ -28,10 +28,10 @@ library
       Parskell
       Parskell.ExpressionTree
       Parskell.ExpressionTree.Conversion
-      Parskell.ExpressionTree.Evaluation
-      Parskell.ExpressionTree.Parser
       Parskell.Lexing.Lexer
       Parskell.Lexing.Tokens
+      Parskell.Parsing.Parser
+      Parskell.Synthesis.Evaluation
       Test
   other-modules:
       Paths_Parskell
@@ -67,8 +67,8 @@ test-suite Parskell-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      ParskellTest.ExpressionTree.ParserTest
       ParskellTest.Lexing.LexerTest
+      ParskellTest.Parsing.ParserTest
       Paths_Parskell
   hs-source-dirs:
       test

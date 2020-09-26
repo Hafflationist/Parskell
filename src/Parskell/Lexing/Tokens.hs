@@ -11,6 +11,8 @@ data Token
     | Literal {content :: Text}
     | Let
     | In
+    | Do
+    | Done
     | Operator {name :: Text}
     | Ignore   
 instance Eq Token where
@@ -22,6 +24,8 @@ instance Eq Token where
     (==) Literal {content = c1} Literal {content = c2} = c1 == c2
     (==) Let Let = True
     (==) In In = True
+    (==) Do Do = True
+    (==) Done Done = True
     (==) Operator {name = n1} Operator {name = n2} = n1 == n2
     (==) Ignore Ignore = True
     (==) _ _ = False
@@ -34,6 +38,7 @@ instance Show Token where
     show Literal {content = c} = " " ++ Data.Text.unpack c ++ " <l> "
     show Let = "let"
     show In = "in"
+    show Do = "do"
+    show Done = "done"
     show Operator {name = n} = " " ++ Data.Text.unpack n ++ " <o> "
     show Ignore = "<ignore>"
-    
