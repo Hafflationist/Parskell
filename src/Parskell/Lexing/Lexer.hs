@@ -54,7 +54,7 @@ disassemble (character : word) acc
     | otherwise = return acc
 
 disassembleLiteralString :: [Char] -> [Char] -> [Token] -> Either String [Token]
-disassembleLiteralString hint [] acc = Left ("'\"" ++ hint ++ "' does not terminate properly!")
+disassembleLiteralString hint [] _ = Left ("'\"" ++ hint ++ "' does not terminate properly!")
 disassembleLiteralString hint (character : word) acc =
     if character == '"'
     then disassemble word (acc ++ [Literal {content = Data.Text.pack hint}])
@@ -102,11 +102,11 @@ lexingWord word
 
 lexingWithoutLines :: Text -> Either [String] [Token]
 lexingWithoutLines input = 
-    let words = Data.Text.lines input >>= Data.Text.words
-        (lefts, rights) = Data.Either.partitionEithers . fmap lexingWord $ words 
-    in if Prelude.null lefts 
-    then Right (Prelude.concat rights)
-    else Left lefts
+    let morpheme = Data.Text.lines input >>= Data.Text.words
+        (errors, niceTokens) = Data.Either.partitionEithers . fmap lexingWord $ morpheme 
+    in if Prelude.null errors 
+    then Right (Prelude.concat niceTokens)
+    else Left errors
 
 
 
@@ -117,10 +117,17 @@ lexing input =
         linesWithCount = Data.List.zip counter inputLines
         inputWords = linesWithCount >>= (\ (countNum, line) -> fmap (countNum,) . Data.Text.words $ line)
         (errors, niceTokens) = Data.Either.partitionEithers
---                        . Data.List.foldl (\ acc (line, token) -> ) (1, Ignore) 
                         . fmap ((\ (c, eith) -> Data.Bifunctor.bimap (c,) (c,) eith) 
                              . Data.Bifunctor.second lexingWord) 
-                        $ inputWords 
+                        $ inputWords
     in if Prelude.null errors 
-    then Right (niceTokens >>= (\ (c, tokens) -> (c,) <$> tokens))
+    then Right
+       . Data.List.tail
+       . Data.List.foldl (\ acc (line, token) -> 
+                            let (preLine, _) = Data.List.last acc
+                            in acc ++ (if preLine == line 
+                                       then [(line, token)] 
+                                       else [(preLine, Newline), (line, token)] )) 
+                         [(1, Ignore)] 
+       $ (niceTokens >>= (\ (c, tokens) -> (c,) <$> tokens))
     else Left errors

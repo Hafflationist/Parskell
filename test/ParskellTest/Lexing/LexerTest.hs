@@ -1,13 +1,12 @@
 module ParskellTest.Lexing.LexerTest where
 
-import Control.Exception (evaluate)
 import Data.Text
 import Data.Either
 import Parskell.Lexing.Tokens
 import Parskell.Lexing.Lexer
 import Test.Hspec
 import Test.HUnit
-import Test.QuickCheck
+--import Test.QuickCheck
 
 
 lexerTest = do

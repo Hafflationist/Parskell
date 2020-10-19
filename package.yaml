@@ -26,6 +26,7 @@ dependencies:
 - QuickCheck
 - HUnit
 - either
+- split
 library:
   source-dirs: src
 
