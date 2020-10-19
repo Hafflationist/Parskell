@@ -1,7 +1,10 @@
 module Parskell.Parsing.Parser (parseExpression) where
 
+import Data.Bifunctor
+import Data.Either
 import Data.Either.Combinators
 import Data.List
+import Data.List.Split
 import Data.Text
 import Text.Read
 import Parskell.ExpressionTree
@@ -19,25 +22,47 @@ readMaybeFloatUnpack = readMaybe . Data.Text.unpack
 hideThingsInParentheses :: Token -> Token -> [Token] -> [Token]
 hideThingsInParentheses opening closing tokens =
     let mapper countNum character
-          | character == opening = (countNum + 1, Ignore)
-          | character == closing = (countNum - 1, Ignore)
+          | character == opening && countNum >= 0 = (countNum + 1, Ignore)
+          | character == closing && countNum > 0 = (countNum - 1, Ignore)
+          | character == closing && countNum == 0 = (countNum - 1, closing)
+          | countNum < 0 = (-1, Ignore)
           | otherwise = (countNum, if countNum == 0 then character else Ignore) 
     in snd . Data.List.mapAccumL mapper 0 $ tokens
-    
+
+
+
+parseStatement :: [Token] -> Either String Statement
+parseStatement tokens = Right GenericStatement {statementContent = Data.Text.pack . show $ tokens}
+
     
     
 parseExpressionDo :: [Token] -> Either [String] Expression
 parseExpressionDo (Parskell.Lexing.Tokens.Do : tokensTail) = 
-    let tokensTailClean = hideThingsInParentheses Do Done tokensTail
-        (doInternal, tail) = Data.List.break (== Done) tokensTailClean
-         -- Zeilen werden durch Semikola oder Zeilenumbrüche getrennt. 
-         -- Die letzten n Zeilen, die nicht als Aussagen geparst werden können, werden als Abschlussausdruck betrachtet
-    in if Done /= Data.List.head tail
-       then Left ["No corresponding 'done' found!"]
-       else Left ["Implement me!"]
+    let tokensTailClean1 = hideThingsInParentheses Do Done tokensTail
+        tokensTailClean = trace (show tokensTailClean1) tokensTailClean1
+    in do
+        lastIndex <- Data.Either.Combinators.maybeToRight ["No corresponding 'done' found!"] 
+                   . elemIndex Done 
+                   $ tokensTailClean
+        let relevantTokens = Data.List.take lastIndex tokensTail -- all tokens without do and done
+        let relevantLines = Data.List.Split.splitWhen (\ e -> e `elem` [Newline, Semicolon]) relevantTokens
+        let lineCount = Data.List.length relevantLines
+        pair <- Data.Either.Combinators.maybeToRight 
+                  ["No last expression found in do-Block! (Every do-Block need an last expression as return value)"]
+              . Data.List.find 
+                  (\ (_, eitherExpression) -> Data.Either.Combinators.isRight eitherExpression)
+              . fmap
+                  (Data.Bifunctor.second (parseExpression . Data.List.concat)
+                     . (`Data.List.splitAt` relevantLines))
+              $ [0..(lineCount - 1)]
+        let (statementTokens, eitherExpression) = trace (show pair) pair
+        lastExpression <- eitherExpression
+        let (errors, statements) = Data.Either.partitionEithers . fmap parseStatement $ statementTokens
+        if not . Data.List.null $ errors
+        then Left errors
+        else Right (DoExpression {doStatements = statements, expression = lastExpression})
 parseExpressionDo _ = Left ["'do'-block does not begin with token 'do'! This error might be caused by a parser bug"]
     
-
 
 
 splitOnAndParse :: BinaryOperator -> [Token] -> Either [String] Expression
@@ -80,7 +105,7 @@ shouldSplitOn tokens operator = operator `elem` hideThingsInParentheses RoundBra
 
 parseExpression :: [Token] -> Either [String] Expression
 parseExpression tokens
-    | Do == Data.List.head tokens && Do == Data.List.last tokens = parseExpressionDo tokens
+    | Do == Data.List.head tokens && Done == Data.List.last tokens = parseExpressionDo tokens
     | trimmedTokens `shouldSplitOn` operatorToken "+" = splitOnAndParse Addition trimmedTokens
     | trimmedTokens `shouldSplitOn` operatorToken "-" = splitOnAndParse Subtraction trimmedTokens
     | trimmedTokens `shouldSplitOn` operatorToken "*" = splitOnAndParse Multiplication trimmedTokens
@@ -94,9 +119,10 @@ parseExpression tokens
 
 parseExpression tokens = parseExpressionConst . trimParentheses $ tokens
     
+parseExpressionConst :: [Token] -> Either [String] Expression
 parseExpressionConst [Parskell.Lexing.Tokens.Literal {content = c}] = do
     value <- maybeToRight ["Could not parse float: " ++ Data.Text.unpack c]
            . readMaybeFloatUnpack 
            $ c
     return (Const (ConstantFloat { valueFloat = value }))
-    
+parseExpressionConst _ = Left ["Expected constant literal!"]

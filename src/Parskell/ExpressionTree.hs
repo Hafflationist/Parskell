@@ -1,5 +1,6 @@
 module Parskell.ExpressionTree (
-    Expression(..), 
+    Expression(..),
+    Statement(..),
     BinaryOperator(..),
     Operator(..), 
     Constant(..), 
@@ -66,11 +67,22 @@ instance Show BinaryOperator where
     show Division = "/"
 
 
+data Statement
+    = Print {printableExpression :: Expression}
+    | GenericStatement {statementContent :: Text}
+instance Eq Statement where
+    (==) Print {printableExpression = e1} Print {printableExpression = e2} = e1 == e2
+    (==) GenericStatement {statementContent = c1} GenericStatement {statementContent = c2} = c1 == c2
+    (==) _ _ = False
+instance Show Statement where
+    show Print {printableExpression = e} = "print " ++ show e
+    show GenericStatement {statementContent = c} = "stmt " ++ show c
+
 data Expression 
     = Const Constant
     | Operation1 {unaryOperator :: UnaryOperator, expression :: Expression}
     | Operation2 {binaryOperator :: BinaryOperator, expression1 :: Expression, expression2 :: Expression}
-    | DoExpression {statements :: [Text], expression :: Expression}
+    | DoExpression {doStatements :: [Statement], expression :: Expression}
 instance Eq Expression where
     (==) (Const a1) (Const a2) = a1 == a2
     (==) Operation1 {unaryOperator = op1, expression = a1} 
@@ -79,11 +91,13 @@ instance Eq Expression where
     (==) Operation2 {binaryOperator = op1, expression1 = a11, expression2 = a21} 
          Operation2 {binaryOperator = op2, expression1 = a12, expression2 = a22} =
          op1 == op2 && a11 == a12 && a21 == a22
+    (==) DoExpression {doStatements = s1, expression = e1} DoExpression {doStatements = s2, expression = e2} =
+         s1 == s2 && e1 == e2
     (==) _ _ = False
 instance Show Expression where
     show (Const a) = show a
     show Operation1 {unaryOperator = op, expression = a} = "(" ++ show op ++ " " ++ show a ++ ")"
     show Operation2 {binaryOperator = op, expression1 = a1, expression2 = a2} = 
         "(" ++ show a1 ++ " " ++ show op ++ " " ++ show a2 ++ ")"
-    show DoExpression {statements = _, expression = expr} =
-        " (do " ++ show expr ++ "done) "
+    show DoExpression {doStatements = ss, expression = expr} =
+        " (do [ " ++ show ss ++ " ] " ++ show expr ++ "done) "

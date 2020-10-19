@@ -247,3 +247,122 @@ parskellTest = do
             expression2 = rightCalc
         }
         Parskell.Parsing.Parser.parseExpression tokens @?= Right expressionTree
+        
+    it "returns a simple expression tree with do-block with single-line expression" $ do
+        let tokens = [
+                        Do,
+                        Literal {content = Data.Text.pack "Hugobert"},
+                        Newline,
+                        Literal {content = Data.Text.pack "Sinnloser Text"},
+                        Semicolon,
+                        Literal {content = Data.Text.pack "Das muss geändert werden, sobald richtige Befehle geparst werden können"},
+                        Newline,
+                        Literal {content = Data.Text.pack "1"},
+                        Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "+"},
+                        Literal {content = Data.Text.pack "1"},
+                        Done
+                     ] -- do things 1+1 done
+        let doBlock = DoExpression {
+            doStatements = [GenericStatement {statementContent = Data.Text.pack . show $ [Literal {content = Data.Text.pack "Hugobert"}]},
+                            GenericStatement {statementContent = Data.Text.pack . show $ [Literal {content = Data.Text.pack "Sinnloser Text"}]},
+                            GenericStatement {statementContent = Data.Text.pack . show $ [Literal {content = Data.Text.pack "Das muss geändert werden, sobald richtige Befehle geparst werden können"}]}], 
+            expression = Operation2 {
+                                     binaryOperator = Addition, 
+                                     expression1 = Const ConstantFloat {valueFloat = 1.0}, 
+                                     expression2 = Const ConstantFloat {valueFloat = 1.0}
+                                 }
+        }
+        Parskell.Parsing.Parser.parseExpression tokens @?= Right doBlock
+        
+    it "returns a simple expression tree with do-block with multi-line expression" $ do
+        let tokens = [
+                        Do,
+                        Literal {content = Data.Text.pack "Hugobert"},
+                        Newline,
+                        Literal {content = Data.Text.pack "Sinnloser Text"},
+                        Semicolon,
+                        Literal {content = Data.Text.pack "Das muss geändert werden, sobald richtige Befehle geparst werden können"},
+                        Newline,
+                        Literal {content = Data.Text.pack "1"},
+                        Newline,
+                        Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "+"},
+                        Literal {content = Data.Text.pack "1"},
+                        Done
+                     ] -- do things 1+1 done
+        let doBlock = DoExpression {
+            doStatements = [GenericStatement {statementContent = Data.Text.pack . show $ [Literal {content = Data.Text.pack "Hugobert"}]},
+                            GenericStatement {statementContent = Data.Text.pack . show $ [Literal {content = Data.Text.pack "Sinnloser Text"}]},
+                            GenericStatement {statementContent = Data.Text.pack . show $ [Literal {content = Data.Text.pack "Das muss geändert werden, sobald richtige Befehle geparst werden können"}]}], 
+            expression = Operation2 {
+                                     binaryOperator = Addition, 
+                                     expression1 = Const ConstantFloat {valueFloat = 1.0}, 
+                                     expression2 = Const ConstantFloat {valueFloat = 1.0}
+                                 }
+        }
+        Parskell.Parsing.Parser.parseExpression tokens @?= Right doBlock
+        
+    it "returns a simple expression tree with do-block without statements" $ do
+        let tokens = [
+                        Do,
+                        Literal {content = Data.Text.pack "1"},
+                        Newline,
+                        Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "+"},
+                        Literal {content = Data.Text.pack "1"},
+                        Done
+                     ] -- do 1+1 done
+        let doBlock = DoExpression {
+            doStatements = [], 
+            expression = Operation2 {
+                                     binaryOperator = Addition, 
+                                     expression1 = Const ConstantFloat {valueFloat = 1.0}, 
+                                     expression2 = Const ConstantFloat {valueFloat = 1.0}
+                                 }
+        }
+        Parskell.Parsing.Parser.parseExpression tokens @?= Right doBlock
+        
+    it "returns a simple expression tree with do-block with complex multi-line expression" $ do
+        let tokens = [
+                        Do,
+                        Literal {content = Data.Text.pack "Hugobert"},
+                        Newline,
+                        Literal {content = Data.Text.pack "Sinnloser Text"},
+                        Semicolon,
+                        Literal {content = Data.Text.pack "Das muss geändert werden, sobald richtige Befehle geparst werden können"},
+                        Newline,
+                        Literal {content = Data.Text.pack "1"},
+                        Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "*"},
+                        RoundBracketOpen,
+                        Literal {content = Data.Text.pack "6"},
+                        Newline,
+                        Newline,
+                        Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "+"},
+                        Literal {content = Data.Text.pack "13"},
+                        RoundBracketClose,
+                        Newline,
+                        Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "*"},
+                        Literal {content = Data.Text.pack "4"},
+                        Newline,
+                        Done
+                     ] -- do things 1*(6+7)*4 done
+        let middleCalc = Operation2 {
+            binaryOperator = Addition, 
+            expression1 = Const ConstantFloat {valueFloat = 6.0}, 
+            expression2 = Const ConstantFloat {valueFloat = 13.0}
+        }
+        let leftCalc = Operation2 {
+            binaryOperator = Multiplication, 
+            expression1 = Const ConstantFloat {valueFloat = 1.0}, 
+            expression2 = middleCalc
+        }
+        let expressionTree = Operation2 {
+            binaryOperator = Multiplication, 
+            expression1 = leftCalc, 
+            expression2 = Const ConstantFloat {valueFloat = 4.0}
+        }
+        let doBlock = DoExpression {
+            doStatements = [GenericStatement {statementContent = Data.Text.pack . show $ [Literal {content = Data.Text.pack "Hugobert"}]},
+                            GenericStatement {statementContent = Data.Text.pack . show $ [Literal {content = Data.Text.pack "Sinnloser Text"}]},
+                            GenericStatement {statementContent = Data.Text.pack . show $ [Literal {content = Data.Text.pack "Das muss geändert werden, sobald richtige Befehle geparst werden können"}]}], 
+            expression = expressionTree
+        }
+        Parskell.Parsing.Parser.parseExpression tokens @?= Right doBlock
