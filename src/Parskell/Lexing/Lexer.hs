@@ -8,6 +8,8 @@ import Data.List
 import Data.Text
 import Parskell.Lexing.Tokens
 
+import Debug.Trace
+
 
 
 operatorChars :: String
@@ -88,16 +90,34 @@ disassembleInit word = disassemble word []
 
 
 
+lexingWordInner :: String -> Token -> Text -> Either String [Token]
+lexingWordInner substring subtoken word =
+    let subtext = Data.Text.pack substring
+        wordTail = Data.Text.intercalate subtext 
+                 . Data.List.tail 
+                 . Data.Text.splitOn subtext 
+                 $ word
+    in if Data.Text.null wordTail
+    then Right [subtoken]
+    else do 
+        tokensTail <- lexingWord wordTail
+        return (subtoken : tokensTail)
+
+
+
 lexingWord :: Text -> Either String [Token]
 lexingWord word
-    | "let" == Data.Text.unpack word = Right [Let]
-    | "in" == Data.Text.unpack word = Right [In]
-    | "do" == Data.Text.unpack word = Right [Do]
-    | "done" == Data.Text.unpack word = Right [Done]
-    | "print" == Data.Text.unpack word = Right [Print]
+    | pa "let" `prefixOf` word = lexingWordInner "let" Let word
+    | pa "in" `prefixOf` word = lexingWordInner "in" In word
+    | pa "return" `prefixOf` word = lexingWordInner "return" Return word
+    | pa "done" `prefixOf` word = lexingWordInner "done" Done word
+    | pa "do" `prefixOf` word = lexingWordInner "do" Do word
+    | pa "print" `prefixOf` word = lexingWordInner "print" Print word
     | otherwise = disassembleInit 
                 . Data.Text.unpack 
                 $ word
+    where pa = Data.Text.pack
+          prefixOf = Data.Text.isPrefixOf
 
 
 
