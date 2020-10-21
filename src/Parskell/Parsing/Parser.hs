@@ -1,5 +1,6 @@
 module Parskell.Parsing.Parser (parseExpression) where
 
+import Control.Monad
 import Data.Bifunctor
 import Data.Either
 import Data.Either.Combinators
@@ -12,6 +13,7 @@ import Parskell.ExpressionTree.Conversion
 import Parskell.Lexing.Tokens
 
 import Debug.Trace
+
 
 
 readMaybeFloatUnpack :: Text -> Maybe Double
@@ -31,15 +33,17 @@ hideThingsInParentheses opening closing tokens =
 
 
 
-parseStatement :: [Token] -> Either String Statement
+parseStatement :: [Token] -> Either [String] Statement
+parseStatement (Print : tokensTail) = do 
+    toBePrinted <- parseExpression tokensTail
+    Right PrintStatement {printableExpression = toBePrinted}
 parseStatement tokens = Right GenericStatement {statementContent = Data.Text.pack . show $ tokens}
 
     
     
 parseExpressionDo :: [Token] -> Either [String] Expression
 parseExpressionDo (Parskell.Lexing.Tokens.Do : tokensTail) = 
-    let tokensTailClean1 = hideThingsInParentheses Do Done tokensTail
-        tokensTailClean = trace (show tokensTailClean1) tokensTailClean1
+    let tokensTailClean = hideThingsInParentheses Do Done tokensTail
     in do
         lastIndex <- Data.Either.Combinators.maybeToRight ["No corresponding 'done' found!"] 
                    . elemIndex Done 
@@ -59,7 +63,7 @@ parseExpressionDo (Parskell.Lexing.Tokens.Do : tokensTail) =
         lastExpression <- eitherExpression
         let (errors, statements) = Data.Either.partitionEithers . fmap parseStatement $ statementTokens
         if not . Data.List.null $ errors
-        then Left errors
+        then Left . Control.Monad.join $ errors
         else Right (DoExpression {doStatements = statements, expression = lastExpression})
 parseExpressionDo _ = Left ["'do'-block does not begin with token 'do'! This error might be caused by a parser bug"]
     

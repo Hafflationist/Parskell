@@ -68,14 +68,14 @@ instance Show BinaryOperator where
 
 
 data Statement
-    = Print {printableExpression :: Expression}
+    = PrintStatement {printableExpression :: Expression}
     | GenericStatement {statementContent :: Text}
 instance Eq Statement where
-    (==) Print {printableExpression = e1} Print {printableExpression = e2} = e1 == e2
+    (==) PrintStatement {printableExpression = e1} PrintStatement {printableExpression = e2} = e1 == e2
     (==) GenericStatement {statementContent = c1} GenericStatement {statementContent = c2} = c1 == c2
     (==) _ _ = False
 instance Show Statement where
-    show Print {printableExpression = e} = "print " ++ show e
+    show PrintStatement {printableExpression = e} = "print " ++ show e
     show GenericStatement {statementContent = c} = "stmt " ++ show c
 
 data Expression 

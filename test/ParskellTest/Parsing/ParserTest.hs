@@ -255,7 +255,8 @@ parskellTest = do
                         Newline,
                         Literal {content = Data.Text.pack "Sinnloser Text"},
                         Semicolon,
-                        Literal {content = Data.Text.pack "Das muss geändert werden, sobald richtige Befehle geparst werden können"},
+                        Print,
+                        Literal {content = Data.Text.pack "42"},
                         Newline,
                         Literal {content = Data.Text.pack "1"},
                         Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "+"},
@@ -265,7 +266,7 @@ parskellTest = do
         let doBlock = DoExpression {
             doStatements = [GenericStatement {statementContent = Data.Text.pack . show $ [Literal {content = Data.Text.pack "Hugobert"}]},
                             GenericStatement {statementContent = Data.Text.pack . show $ [Literal {content = Data.Text.pack "Sinnloser Text"}]},
-                            GenericStatement {statementContent = Data.Text.pack . show $ [Literal {content = Data.Text.pack "Das muss geändert werden, sobald richtige Befehle geparst werden können"}]}], 
+                            PrintStatement {printableExpression = Const ConstantFloat {valueFloat = 42.0}}], 
             expression = Operation2 {
                                      binaryOperator = Addition, 
                                      expression1 = Const ConstantFloat {valueFloat = 1.0}, 
@@ -281,7 +282,8 @@ parskellTest = do
                         Newline,
                         Literal {content = Data.Text.pack "Sinnloser Text"},
                         Semicolon,
-                        Literal {content = Data.Text.pack "Das muss geändert werden, sobald richtige Befehle geparst werden können"},
+                        Print,
+                        Literal {content = Data.Text.pack "42"},
                         Newline,
                         Literal {content = Data.Text.pack "1"},
                         Newline,
@@ -292,7 +294,7 @@ parskellTest = do
         let doBlock = DoExpression {
             doStatements = [GenericStatement {statementContent = Data.Text.pack . show $ [Literal {content = Data.Text.pack "Hugobert"}]},
                             GenericStatement {statementContent = Data.Text.pack . show $ [Literal {content = Data.Text.pack "Sinnloser Text"}]},
-                            GenericStatement {statementContent = Data.Text.pack . show $ [Literal {content = Data.Text.pack "Das muss geändert werden, sobald richtige Befehle geparst werden können"}]}], 
+                            PrintStatement {printableExpression = Const ConstantFloat {valueFloat = 42.0}}], 
             expression = Operation2 {
                                      binaryOperator = Addition, 
                                      expression1 = Const ConstantFloat {valueFloat = 1.0}, 
@@ -327,7 +329,8 @@ parskellTest = do
                         Newline,
                         Literal {content = Data.Text.pack "Sinnloser Text"},
                         Semicolon,
-                        Literal {content = Data.Text.pack "Das muss geändert werden, sobald richtige Befehle geparst werden können"},
+                        Print,
+                        Literal {content = Data.Text.pack "42"},
                         Newline,
                         Literal {content = Data.Text.pack "1"},
                         Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "*"},
@@ -362,7 +365,7 @@ parskellTest = do
         let doBlock = DoExpression {
             doStatements = [GenericStatement {statementContent = Data.Text.pack . show $ [Literal {content = Data.Text.pack "Hugobert"}]},
                             GenericStatement {statementContent = Data.Text.pack . show $ [Literal {content = Data.Text.pack "Sinnloser Text"}]},
-                            GenericStatement {statementContent = Data.Text.pack . show $ [Literal {content = Data.Text.pack "Das muss geändert werden, sobald richtige Befehle geparst werden können"}]}], 
+                            PrintStatement {printableExpression = Const ConstantFloat {valueFloat = 42.0}}], 
             expression = expressionTree
         }
         Parskell.Parsing.Parser.parseExpression tokens @?= Right doBlock
