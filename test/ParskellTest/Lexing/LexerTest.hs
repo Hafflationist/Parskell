@@ -112,12 +112,12 @@ lexerTest = do
                          ]
             Parskell.Lexing.Lexer.lexingWithoutLines word @?= Right tokens
             
-        it "returns a simple token list (let a <- 0 in a ** 20i) return" $ do
-            let line = Data.Text.pack "let a <- 0 in a ** 20i return"
+        it "returns a simple token list (let a = 0 in a ** 20i return)" $ do
+            let line = Data.Text.pack "let a = 0 in a ** 20i return"
             let tokens = [
                          Let,
                          Identifier {name = Data.Text.pack "a"}, 
-                         Operator {name = Data.Text.pack "<-"}, 
+                         Operator {name = Data.Text.pack "="}, 
                          LiteralNumber {content = Data.Text.pack "0"},
                          In,
                          Identifier {name = Data.Text.pack "a"}, 
@@ -127,13 +127,13 @@ lexerTest = do
                          ]
             Parskell.Lexing.Lexer.lexingWithoutLines line @?= Right tokens
                 
-        it "returns a simple token list ([let a <- 0 in a ** 20i return])" $ do
-            let line = Data.Text.pack "[let a <- 0 in a ** 20i return]"
+        it "returns a simple token list ([let a = 0 in a ** 20i return])" $ do
+            let line = Data.Text.pack "[let a = 0 in a ** 20i return]"
             let tokens = [
                          SquareBracketOpen,
                          Let,
                          Identifier {name = Data.Text.pack "a"}, 
-                         Operator {name = Data.Text.pack "<-"}, 
+                         Operator {name = Data.Text.pack "="}, 
                          LiteralNumber {content = Data.Text.pack "0"},
                          In,
                          Identifier {name = Data.Text.pack "a"}, 
@@ -158,16 +158,16 @@ lexerTest = do
                          ]
             Parskell.Lexing.Lexer.lexing line @?= Right tokens
                 
-        it "returns a simple token list (let a <- 0 in a ** 20i return)" $ do
+        it "returns a simple token list (let a = 0 in a ** 20i return)" $ do
             let line = Data.Text.pack "let \n\
-                                      \a <- 0 \n\
+                                      \a = 0 \n\
                                       \in a ** 20i\n\
                                       \return"
             let tokens = [
                          (1, Let),
                          (1, Newline),
                          (2, Identifier {name = Data.Text.pack "a"}),
-                         (2, Operator {name = Data.Text.pack "<-"}), 
+                         (2, Operator {name = Data.Text.pack "="}), 
                          (2, LiteralNumber {content = Data.Text.pack "0"}),
                          (2, Newline),
                          (3, In),

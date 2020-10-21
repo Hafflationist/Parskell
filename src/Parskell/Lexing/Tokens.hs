@@ -44,7 +44,7 @@ instance Show Token where
     show RoundBracketClose = ")"
     show SquareBracketOpen = "["
     show SquareBracketClose = "]"
-    show Identifier {name = n} = " " ++ Data.Text.unpack n ++ " <i> "
+    show Identifier {name = n} = " " ++ Data.Text.unpack n ++ " <ident> "
     show LiteralNumber {content = c} = " " ++ Data.Text.unpack c ++ " <lnum> "
     show LiteralString {content = c} = " " ++ Data.Text.unpack c ++ " <lstr> "
     show Let = " let "

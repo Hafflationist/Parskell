@@ -12,7 +12,7 @@ parskellTest = do
     it "returns a simple expression tree +" $ do
         let tokens = [
                         LiteralNumber {content = Data.Text.pack "1"},
-                        Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "+"},
+                        Operator {name = Data.Text.pack "+"},
                         LiteralNumber {content = Data.Text.pack "1"}
                      ] -- 1+1
         let expressionTree = Parskell.ExpressionTree.Operation2 {
@@ -25,7 +25,7 @@ parskellTest = do
     it "returns a simple expression tree -" $ do
         let tokens = [
                         LiteralNumber {content = Data.Text.pack "1"},
-                        Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "-"},
+                        Operator {name = Data.Text.pack "-"},
                         LiteralNumber {content = Data.Text.pack "1"}
                      ] -- 1-1
         let expressionTree = Operation2 {
@@ -38,7 +38,7 @@ parskellTest = do
     it "returns a simple expression tree *" $ do
         let tokens = [
                         LiteralNumber {content = Data.Text.pack "1"},
-                        Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "*"},
+                        Operator {name = Data.Text.pack "*"},
                         LiteralNumber {content = Data.Text.pack "1"}
                      ] -- 1*1
         let expressionTree = Operation2 {
@@ -51,7 +51,7 @@ parskellTest = do
     it "returns a simple expression tree /" $ do
         let tokens = [
                         LiteralNumber {content = Data.Text.pack "1"},
-                        Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "/"},
+                        Operator {name = Data.Text.pack "/"},
                         LiteralNumber {content = Data.Text.pack "1"}
                      ] -- 1/1
         let expressionTree = Operation2 {
@@ -64,7 +64,7 @@ parskellTest = do
     it "returns a simple expression tree ++" $ do
         let tokens = [
                         LiteralString {content = Data.Text.pack "hugo"},
-                        Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "++"},
+                        Operator {name = Data.Text.pack "++"},
                         LiteralString {content = Data.Text.pack "bert"}
                      ] -- "hugo"++"bert"
         let expressionTree = Parskell.ExpressionTree.Operation2 {
@@ -77,9 +77,9 @@ parskellTest = do
     it "returns a simple expression tree with left2right" $ do
         let tokens = [
                         LiteralNumber {content = Data.Text.pack "1"},
-                        Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "+"},
+                        Operator {name = Data.Text.pack "+"},
                         LiteralNumber {content = Data.Text.pack "2"},
-                        Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "+"},
+                        Operator {name = Data.Text.pack "+"},
                         LiteralNumber {content = Data.Text.pack "3"}
                      ] -- 1+2+3
         let firstCalc = Operation2 {
@@ -97,11 +97,11 @@ parskellTest = do
     it "returns a simple expression tree with precedence over left2right" $ do
         let tokens = [
                         LiteralNumber {content = Data.Text.pack "1"},
-                        Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "+"},
+                        Operator {name = Data.Text.pack "+"},
                         LiteralNumber {content = Data.Text.pack "2"},
-                        Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "*"},
+                        Operator {name = Data.Text.pack "*"},
                         LiteralNumber {content = Data.Text.pack "3"},
-                        Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "+"},
+                        Operator {name = Data.Text.pack "+"},
                         LiteralNumber {content = Data.Text.pack "4"}
                      ] -- 1+2*3+4
         let middleCalc = Operation2 {
@@ -124,13 +124,13 @@ parskellTest = do
     it "returns a simple expression tree with brackets over left2right" $ do
         let tokens = [
                         LiteralNumber {content = Data.Text.pack "2"},
-                        Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "+"},
+                        Operator {name = Data.Text.pack "+"},
                         RoundBracketOpen,
                         LiteralNumber {content = Data.Text.pack "3"},
-                        Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "+"},
+                        Operator {name = Data.Text.pack "+"},
                         LiteralNumber {content = Data.Text.pack "4"},
                         RoundBracketClose,
-                        Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "+"},
+                        Operator {name = Data.Text.pack "+"},
                         LiteralNumber {content = Data.Text.pack "5"}
                      ] -- 2+(3+4)+5
         let middleCalc = Operation2 {
@@ -153,13 +153,13 @@ parskellTest = do
     it "returns a simple expression tree with brackets over precedence" $ do
         let tokens = [
                         LiteralNumber {content = Data.Text.pack "1"},
-                        Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "*"},
+                        Operator {name = Data.Text.pack "*"},
                         RoundBracketOpen,
                         LiteralNumber {content = Data.Text.pack "6"},
-                        Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "+"},
+                        Operator {name = Data.Text.pack "+"},
                         LiteralNumber {content = Data.Text.pack "7"},
                         RoundBracketClose,
-                        Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "*"},
+                        Operator {name = Data.Text.pack "*"},
                         LiteralNumber {content = Data.Text.pack "4"}
                      ] -- 1*(6+7)*4
         let middleCalc = Operation2 {
@@ -185,7 +185,7 @@ parskellTest = do
                         LiteralNumber {content = Data.Text.pack "1"},
                         Ignore,
                         Ignore,
-                        Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "*"},
+                        Operator {name = Data.Text.pack "*"},
                         Ignore,
                         RoundBracketOpen,
                         Ignore,
@@ -193,7 +193,7 @@ parskellTest = do
                         LiteralNumber {content = Data.Text.pack "6"},
                         Ignore,
                         Ignore,
-                        Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "+"},
+                        Operator {name = Data.Text.pack "+"},
                         Ignore,
                         LiteralNumber {content = Data.Text.pack "7"},
                         RoundBracketClose,
@@ -217,7 +217,7 @@ parskellTest = do
                         RoundBracketOpen,
                         RoundBracketOpen,
                         LiteralNumber {content = Data.Text.pack "1"},
-                        Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "+"},
+                        Operator {name = Data.Text.pack "+"},
                         LiteralNumber {content = Data.Text.pack "1"},
                         RoundBracketClose,
                         RoundBracketClose,
@@ -234,13 +234,13 @@ parskellTest = do
         let tokens = [
                         RoundBracketOpen,
                         LiteralNumber {content = Data.Text.pack "1"},
-                        Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "/"},
+                        Operator {name = Data.Text.pack "/"},
                         LiteralNumber {content = Data.Text.pack "2"},
                         RoundBracketClose,
-                        Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "/"},
+                        Operator {name = Data.Text.pack "/"},
                         RoundBracketOpen,
                         LiteralNumber {content = Data.Text.pack "3"},
-                        Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "/"},
+                        Operator {name = Data.Text.pack "/"},
                         LiteralNumber {content = Data.Text.pack "4"},
                         RoundBracketClose
                      ] -- (1/2)/(3/4)
@@ -272,7 +272,7 @@ parskellTest = do
                         LiteralNumber {content = Data.Text.pack "42"},
                         Newline,
                         LiteralNumber {content = Data.Text.pack "1"},
-                        Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "+"},
+                        Operator {name = Data.Text.pack "+"},
                         LiteralNumber {content = Data.Text.pack "1"},
                         Done
                      ] -- do things 1+1 done
@@ -280,7 +280,7 @@ parskellTest = do
             doStatements = [GenericStatement {statementContent = Data.Text.pack . show $ [LiteralString {content = Data.Text.pack "Hugobert"}]},
                             GenericStatement {statementContent = Data.Text.pack . show $ [LiteralString {content = Data.Text.pack "Sinnloser Text"}]},
                             PrintStatement {printableExpression = Const ConstantFloat {valueFloat = 42.0}}], 
-            expression = Operation2 {
+            doExpression = Operation2 {
                                      binaryOperator = Addition, 
                                      expression1 = Const ConstantFloat {valueFloat = 1.0}, 
                                      expression2 = Const ConstantFloat {valueFloat = 1.0}
@@ -300,7 +300,7 @@ parskellTest = do
                         Newline,
                         LiteralNumber {content = Data.Text.pack "1"},
                         Newline,
-                        Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "+"},
+                        Operator {name = Data.Text.pack "+"},
                         LiteralNumber {content = Data.Text.pack "1"},
                         Done
                      ] -- do things 1+1 done
@@ -308,7 +308,7 @@ parskellTest = do
             doStatements = [GenericStatement {statementContent = Data.Text.pack . show $ [LiteralString {content = Data.Text.pack "Hugobert"}]},
                             GenericStatement {statementContent = Data.Text.pack . show $ [LiteralString {content = Data.Text.pack "Sinnloser Text"}]},
                             PrintStatement {printableExpression = Const ConstantFloat {valueFloat = 42.0}}], 
-            expression = Operation2 {
+            doExpression = Operation2 {
                                      binaryOperator = Addition, 
                                      expression1 = Const ConstantFloat {valueFloat = 1.0}, 
                                      expression2 = Const ConstantFloat {valueFloat = 1.0}
@@ -321,13 +321,13 @@ parskellTest = do
                         Do,
                         LiteralNumber {content = Data.Text.pack "1"},
                         Newline,
-                        Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "+"},
+                        Operator {name = Data.Text.pack "+"},
                         LiteralNumber {content = Data.Text.pack "1"},
                         Done
                      ] -- do 1+1 done
         let doBlock = DoExpression {
             doStatements = [], 
-            expression = Operation2 {
+            doExpression = Operation2 {
                                      binaryOperator = Addition, 
                                      expression1 = Const ConstantFloat {valueFloat = 1.0}, 
                                      expression2 = Const ConstantFloat {valueFloat = 1.0}
@@ -346,16 +346,16 @@ parskellTest = do
                         LiteralNumber {content = Data.Text.pack "42"},
                         Newline,
                         LiteralNumber {content = Data.Text.pack "1"},
-                        Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "*"},
+                        Operator {name = Data.Text.pack "*"},
                         RoundBracketOpen,
                         LiteralNumber {content = Data.Text.pack "6"},
                         Newline,
                         Newline,
-                        Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "+"},
+                        Operator {name = Data.Text.pack "+"},
                         LiteralNumber {content = Data.Text.pack "13"},
                         RoundBracketClose,
                         Newline,
-                        Parskell.Lexing.Tokens.Operator {name = Data.Text.pack "*"},
+                        Operator {name = Data.Text.pack "*"},
                         LiteralNumber {content = Data.Text.pack "4"},
                         Newline,
                         Done
@@ -379,6 +379,97 @@ parskellTest = do
             doStatements = [GenericStatement {statementContent = Data.Text.pack . show $ [LiteralString {content = Data.Text.pack "Hugobert"}]},
                             GenericStatement {statementContent = Data.Text.pack . show $ [LiteralString {content = Data.Text.pack "Sinnloser Text"}]},
                             PrintStatement {printableExpression = Const ConstantFloat {valueFloat = 42.0}}], 
-            expression = expressionTree
+            doExpression = expressionTree
         }
         Parskell.Parsing.Parser.parseExpression tokens @?= Right doBlock
+        
+    it "returns a simple expression tree with let-expression with single-line expression" $ do
+        let tokens = [
+                        Let,
+                        Identifier {name = Data.Text.pack "a"},
+                        Operator {name = Data.Text.pack "="},
+                        LiteralNumber {content = Data.Text.pack "42"},
+                        In,
+                        Identifier {name = Data.Text.pack "a"},
+                        Operator {name = Data.Text.pack "*"},
+                        LiteralNumber {content = Data.Text.pack "20"},
+                        Return
+                     ] -- let a = 42 in a ** 20i return
+        let expr = Operation2 {
+            binaryOperator = Multiplication, 
+            expression1 = Assignee {assigneeName = Data.Text.pack "a"}, 
+            expression2 = Const ConstantFloat {valueFloat = 20.0}
+        }
+        let letExpressionBlock = LetExpression {
+            letAssignments = [Assignment {
+                assignmentIdentifier = Data.Text.pack "a", 
+                assignmentExpression = Const ConstantFloat {valueFloat = 42.0}}],
+            letExpression = expr
+        }
+        Parskell.Parsing.Parser.parseExpression tokens @?= Right letExpressionBlock
+        
+    it "returns a simple expression tree with let-expression with complex multi-line expression" $ do
+        let tokens = [
+                        Let,
+                        Identifier {name = Data.Text.pack "a"},
+                        Operator {name = Data.Text.pack "="},
+                        LiteralNumber {content = Data.Text.pack "42"},
+                        In,
+                        LiteralNumber {content = Data.Text.pack "1"},
+                        Operator {name = Data.Text.pack "*"},
+                        RoundBracketOpen,
+                        Identifier {name = Data.Text.pack "a"},
+                        Newline,
+                        Newline,
+                        Operator {name = Data.Text.pack "+"},
+                        LiteralNumber {content = Data.Text.pack "13"},
+                        RoundBracketClose,
+                        Newline,
+                        Operator {name = Data.Text.pack "*"},
+                        LiteralNumber {content = Data.Text.pack "4"},
+                        Newline,
+                        Return
+                     ] -- let a = 42 in 1 * (a + 13) * 4) return
+        let middleCalc = Operation2 {
+            binaryOperator = Addition, 
+            expression1 = Assignee {assigneeName = Data.Text.pack "a"}, 
+            expression2 = Const ConstantFloat {valueFloat = 13.0}
+        }
+        let leftCalc = Operation2 {
+            binaryOperator = Multiplication, 
+            expression1 = Const ConstantFloat {valueFloat = 1.0}, 
+            expression2 = middleCalc
+        }
+        let expr = Operation2 {
+            binaryOperator = Multiplication, 
+            expression1 = leftCalc, 
+            expression2 = Const ConstantFloat {valueFloat = 4.0}
+        }
+        let letExpressionBlock = LetExpression {
+            letAssignments = [Assignment {
+                assignmentIdentifier = Data.Text.pack "a", 
+                assignmentExpression = Const ConstantFloat {valueFloat = 42.0}}],
+            letExpression = expr
+        }
+        Parskell.Parsing.Parser.parseExpression tokens @?= Right letExpressionBlock
+        
+    it "returns a simple expression tree with distortion" $ do
+        let tokens = [
+                        RoundBracketOpen,
+                        Newline,
+                        RoundBracketOpen,
+                        Newline,
+                        RoundBracketOpen,
+                        Newline,
+                        RoundBracketOpen,
+                        LiteralNumber {content = Data.Text.pack "1"},
+                        RoundBracketClose,
+                        Newline,
+                        RoundBracketClose,
+                        Newline,
+                        RoundBracketClose,
+                        Newline,
+                        RoundBracketClose
+                     ] -- (\n(\n(\n(1)\n)\n)\n)
+        let expr = Const ConstantFloat {valueFloat = 1.0}
+        Parskell.Parsing.Parser.parseExpression tokens @?= Right expr
