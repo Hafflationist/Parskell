@@ -14,6 +14,7 @@ data Token
     | Return
     | Do
     | Done
+    | Print
     | Operator {name :: Text}
     | Semicolon
     | Newline
@@ -30,6 +31,7 @@ instance Eq Token where
     (==) Do Do = True
     (==) Return Return = True
     (==) Done Done = True
+    (==) Print Print = True
     (==) Operator {name = n1} Operator {name = n2} = n1 == n2
     (==) Semicolon Semicolon = True
     (==) Newline Newline = True
@@ -47,6 +49,7 @@ instance Show Token where
     show Return = " return "
     show Do = " do "
     show Done = " done "
+    show Print = " print "
     show Operator {name = n} = " " ++ Data.Text.unpack n ++ " <o> "
     show Semicolon = "; "
     show Newline = "<\\n> "

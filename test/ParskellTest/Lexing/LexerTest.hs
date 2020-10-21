@@ -151,3 +151,22 @@ lexerTest = do
                              (3, Literal {content = Data.Text.pack "20i"})
                              ]
                 Parskell.Lexing.Lexer.lexing line @?= Right tokens
+                
+        it "returns a simple token (let a <- 0 in a ** 20i)" $ do
+                let line = Data.Text.pack "do \n\
+                                          \print 34 \n\
+                                          \2 ** 20i\n\
+                                          \done"
+                let tokens = [
+                             (1, Do),
+                             (1, Newline),
+                             (2, Print),
+                             (2, Literal {content = Data.Text.pack "34"}),
+                             (2, Newline),
+                             (3, Literal {content = Data.Text.pack "2"}),
+                             (3, Operator {name = Data.Text.pack "**"}),
+                             (3, Literal {content = Data.Text.pack "20i"}),
+                             (3, Newline),
+                             (4, Done)
+                             ]
+                Parskell.Lexing.Lexer.lexing line @?= Right tokens

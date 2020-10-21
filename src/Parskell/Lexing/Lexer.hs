@@ -94,6 +94,7 @@ lexingWord word
     | "in" == Data.Text.unpack word = Right [In]
     | "do" == Data.Text.unpack word = Right [Do]
     | "done" == Data.Text.unpack word = Right [Done]
+    | "print" == Data.Text.unpack word = Right [Print]
     | otherwise = disassembleInit 
                 . Data.Text.unpack 
                 $ word
