@@ -57,7 +57,7 @@ disassembleLiteralString :: [Char] -> [Char] -> [Token] -> Either String [Token]
 disassembleLiteralString hint [] _ = Left ("'\"" ++ hint ++ "' does not terminate properly!")
 disassembleLiteralString hint (character : word) acc =
     if character == '"'
-    then disassemble word (acc ++ [Literal {content = Data.Text.pack hint}])
+    then disassemble word (acc ++ [LiteralString {content = Data.Text.pack hint}])
     else disassembleLiteralString (hint ++ [character]) word acc
 
 disassembleOperator :: [Char] -> [Char] -> [Token] -> Either String [Token]
@@ -68,11 +68,11 @@ disassembleOperator hint (character : word) acc =
     else disassemble (character : word) (acc ++ [Operator {name = Data.Text.pack hint}])
 
 disassembleNumber :: [Char] -> [Char] -> [Token] -> Either String [Token]
-disassembleNumber hint [] acc = Right (acc ++ [Literal {content = Data.Text.pack hint}])
+disassembleNumber hint [] acc = Right (acc ++ [LiteralNumber {content = Data.Text.pack hint}])
 disassembleNumber hint (character : word) acc
     | character `elem` numberChars || '.' == character = disassembleNumber (hint ++ [character]) word acc
-    | character `elem` ['a'..'z'] = disassemble word (acc ++ [Literal {content = Data.Text.pack (hint ++ [character])}])
-    | otherwise = disassemble (character : word) (acc ++ [Literal {content = Data.Text.pack hint}])
+    | character `elem` ['a'..'z'] = disassemble word (acc ++ [LiteralNumber {content = Data.Text.pack (hint ++ [character])}])
+    | otherwise = disassemble (character : word) (acc ++ [LiteralNumber {content = Data.Text.pack hint}])
 
 disassembleIdentifier :: [Char] -> [Char] -> [Token] -> Either String [Token]
 disassembleIdentifier hint [] acc = Right (acc ++ [identifier2Keyword Identifier {name = Data.Text.pack hint}])

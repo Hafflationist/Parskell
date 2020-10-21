@@ -8,7 +8,8 @@ data Token
     | SquareBracketOpen
     | SquareBracketClose
     | Identifier {name :: Text}
-    | Literal {content :: Text}
+    | LiteralNumber {content :: Text}
+    | LiteralString {content :: Text}
     | Let
     | In
     | Return
@@ -25,7 +26,8 @@ instance Eq Token where
     (==) SquareBracketOpen SquareBracketOpen = True
     (==) SquareBracketClose SquareBracketClose = True
     (==) Identifier {name = n1} Identifier {name = n2} = n1 == n2
-    (==) Literal {content = c1} Literal {content = c2} = c1 == c2
+    (==) LiteralNumber {content = c1} LiteralNumber {content = c2} = c1 == c2
+    (==) LiteralString {content = c1} LiteralString {content = c2} = c1 == c2
     (==) Let Let = True
     (==) In In = True
     (==) Do Do = True
@@ -43,7 +45,8 @@ instance Show Token where
     show SquareBracketOpen = "["
     show SquareBracketClose = "]"
     show Identifier {name = n} = " " ++ Data.Text.unpack n ++ " <i> "
-    show Literal {content = c} = " " ++ Data.Text.unpack c ++ " <l> "
+    show LiteralNumber {content = c} = " " ++ Data.Text.unpack c ++ " <lnum> "
+    show LiteralString {content = c} = " " ++ Data.Text.unpack c ++ " <lstr> "
     show Let = " let "
     show In = " in "
     show Return = " return "

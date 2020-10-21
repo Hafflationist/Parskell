@@ -18,13 +18,16 @@ data TType
 data Constant
     = ConstantFloat {valueFloat :: Double}
     | ConstantInteger {valueInteger :: Integer}
+    | ConstantString {valueString :: Text}
 instance Eq Constant where
     (==) ConstantFloat {valueFloat = a} ConstantFloat {valueFloat = b} = a == b
     (==) ConstantInteger {valueInteger = a} ConstantInteger {valueInteger = b} = a == b 
+    (==) ConstantString {valueString = a} ConstantString {valueString = b} = a == b 
     (==) _ _ = False
 instance Show Constant where
     show ConstantFloat {valueFloat = a} = "(" ++ show a ++ ")" 
     show ConstantInteger {valueInteger = a} = "(" ++ show a ++ ")" 
+    show ConstantString {valueString = a} = "(\"" ++ show a ++ "\")" 
     
     
 data Operator 
@@ -54,17 +57,20 @@ data BinaryOperator
     | Subtraction
     | Multiplication
     | Division
+    | Concatenation
 instance Eq BinaryOperator where
     (==) Addition Addition = True
     (==) Subtraction Subtraction = True
     (==) Multiplication Multiplication = True
     (==) Division Division = True
+    (==) Concatenation Concatenation = True
     (==) _ _ = False
 instance Show BinaryOperator where
     show Addition = "+"
     show Subtraction = "-"
     show Multiplication = "*"
     show Division = "/"
+    show Concatenation = "++"
 
 
 data Statement

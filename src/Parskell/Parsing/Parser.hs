@@ -114,6 +114,7 @@ parseExpression tokens
     | trimmedTokens `shouldSplitOn` operatorToken "-" = splitOnAndParse Subtraction trimmedTokens
     | trimmedTokens `shouldSplitOn` operatorToken "*" = splitOnAndParse Multiplication trimmedTokens
     | trimmedTokens `shouldSplitOn` operatorToken "/" = splitOnAndParse Division trimmedTokens
+    | trimmedTokens `shouldSplitOn` operatorToken "++" = splitOnAndParse Concatenation trimmedTokens
     where operatorToken op = Parskell.Lexing.Tokens.Operator { name = Data.Text.pack op}
           filterIgnore = Data.List.filter (/= Ignore)
           trimmedTokens = filterIgnore 
@@ -124,9 +125,12 @@ parseExpression tokens
 parseExpression tokens = parseExpressionConst . trimParentheses $ tokens
     
 parseExpressionConst :: [Token] -> Either [String] Expression
-parseExpressionConst [Parskell.Lexing.Tokens.Literal {content = c}] = do
+parseExpressionConst [Parskell.Lexing.Tokens.LiteralNumber {content = c}] = do
     value <- maybeToRight ["Could not parse float: " ++ Data.Text.unpack c]
            . readMaybeFloatUnpack 
            $ c
     return (Const (ConstantFloat { valueFloat = value }))
-parseExpressionConst _ = Left ["Expected constant literal!"]
+parseExpressionConst [Parskell.Lexing.Tokens.LiteralString {content = c}] = 
+    Right (Const (ConstantString { valueString = c }))
+parseExpressionConst _ = 
+    Left ["Expected constant literal!"]
