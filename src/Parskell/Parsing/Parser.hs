@@ -52,7 +52,7 @@ parseExpressionDo (Parskell.Lexing.Tokens.Do : tokensTail) =
         let linesRelevant = Data.List.Split.splitWhen (\ e -> e `elem` [Newline, Semicolon]) tokensRelevant
         let lineCount = Data.List.length linesRelevant
         pair <- Data.Either.Combinators.maybeToRight -- TODO Add empty expression!
-                  ["No last expression found in do-Block! (Every do-Block need an last expression as return value)"]
+                  ["No last expression found in do-Block! (Every do-Block needs a last expression as return value)"]
               . Data.List.find 
                   (\ (_, eitherExpression) -> Data.Either.Combinators.isRight eitherExpression)
               . fmap
