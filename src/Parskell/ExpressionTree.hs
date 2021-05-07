@@ -2,6 +2,7 @@ module Parskell.ExpressionTree (
     Expression(..),
     Assignment(..),
     Statement(..),
+    UnaryOperator(..),
     BinaryOperator(..),
     Operator(..), 
     Constant(..),

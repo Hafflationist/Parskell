@@ -1,6 +1,6 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.34.2.
+-- This file has been generated from package.yaml by hpack version 0.34.4.
 --
 -- see: https://github.com/sol/hpack
 
@@ -32,7 +32,7 @@ library
       Parskell.Lexing.Tokens
       Parskell.Parsing.Parser
       Parskell.Synthesis.Evaluation
-      Test
+      Parskell.Synthesis.Letifier
   other-modules:
       Paths_Parskell
   hs-source-dirs:
@@ -71,6 +71,7 @@ test-suite Parskell-test
   other-modules:
       ParskellTest.Lexing.LexerTest
       ParskellTest.Parsing.ParserTest
+      ParskellTest.Synthesis.LetifierTest
       Paths_Parskell
   hs-source-dirs:
       test

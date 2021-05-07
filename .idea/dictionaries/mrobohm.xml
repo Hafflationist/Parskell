@@ -4,7 +4,13 @@
       <w>accum</w>
       <w>bifunctor</w>
       <w>bimap</w>
+      <w>denest</w>
+      <w>denester</w>
+      <w>dexp</w>
       <w>eith</w>
+      <w>letifier</w>
+      <w>letify</w>
+      <w>lexp</w>
       <w>parskell</w>
       <w>subtoken</w>
       <w>system.io</w>
