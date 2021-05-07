@@ -19,26 +19,8 @@ data Token
     | Operator {name :: Text}
     | Semicolon
     | Newline
-    | Ignore   
-instance Eq Token where
-    (==) RoundBracketOpen RoundBracketOpen = True
-    (==) RoundBracketClose RoundBracketClose = True
-    (==) SquareBracketOpen SquareBracketOpen = True
-    (==) SquareBracketClose SquareBracketClose = True
-    (==) Identifier {name = n1} Identifier {name = n2} = n1 == n2
-    (==) LiteralNumber {content = c1} LiteralNumber {content = c2} = c1 == c2
-    (==) LiteralString {content = c1} LiteralString {content = c2} = c1 == c2
-    (==) Let Let = True
-    (==) In In = True
-    (==) Do Do = True
-    (==) Return Return = True
-    (==) Done Done = True
-    (==) Print Print = True
-    (==) Operator {name = n1} Operator {name = n2} = n1 == n2
-    (==) Semicolon Semicolon = True
-    (==) Newline Newline = True
-    (==) Ignore Ignore = True
-    (==) _ _ = False
+    | Ignore
+    deriving Eq
 instance Show Token where
     show RoundBracketOpen = "("
     show RoundBracketClose = ")"

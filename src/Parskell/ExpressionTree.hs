@@ -21,11 +21,7 @@ data Constant
     = ConstantFloat {valueFloat :: Double}
     | ConstantInteger {valueInteger :: Integer}
     | ConstantString {valueString :: Text}
-instance Eq Constant where
-    (==) ConstantFloat {valueFloat = a} ConstantFloat {valueFloat = b} = a == b
-    (==) ConstantInteger {valueInteger = a} ConstantInteger {valueInteger = b} = a == b 
-    (==) ConstantString {valueString = a} ConstantString {valueString = b} = a == b 
-    (==) _ _ = False
+    deriving Eq
 instance Show Constant where
     show ConstantFloat {valueFloat = a} = "(" ++ show a ++ ")" 
     show ConstantInteger {valueInteger = a} = "(" ++ show a ++ ")" 
@@ -35,9 +31,7 @@ instance Show Constant where
 data Operator 
     = Unary UnaryOperator
     | Binary BinaryOperator 
-instance Eq Operator where
-    (==) (Unary a1) (Unary a2) = a1 == a2
-    (==) _ _ = False
+    deriving Eq
 instance Show Operator where
     show (Unary unop) = show unop
     show (Binary unop) = show unop
@@ -46,10 +40,7 @@ instance Show Operator where
 data UnaryOperator 
     = Negation
     | BitNegation
-instance Eq UnaryOperator where
-    (==) Negation Negation = True
-    (==) BitNegation BitNegation = True
-    (==) _ _ = False
+    deriving Eq
 instance Show UnaryOperator where
     show Negation = "-"
     show BitNegation = "~"
@@ -60,13 +51,7 @@ data BinaryOperator
     | Multiplication
     | Division
     | Concatenation
-instance Eq BinaryOperator where
-    (==) Addition Addition = True
-    (==) Subtraction Subtraction = True
-    (==) Multiplication Multiplication = True
-    (==) Division Division = True
-    (==) Concatenation Concatenation = True
-    (==) _ _ = False
+    deriving Eq
 instance Show BinaryOperator where
     show Addition = "+"
     show Subtraction = "-"
@@ -78,19 +63,14 @@ instance Show BinaryOperator where
 data Statement
     = PrintStatement {printableExpression :: Expression}
     | GenericStatement {statementContent :: Text}
-instance Eq Statement where
-    (==) PrintStatement {printableExpression = e1} PrintStatement {printableExpression = e2} = e1 == e2
-    (==) GenericStatement {statementContent = c1} GenericStatement {statementContent = c2} = c1 == c2
-    (==) _ _ = False
+    deriving Eq
 instance Show Statement where
     show PrintStatement {printableExpression = e} = "print " ++ show e
     show GenericStatement {statementContent = c} = "stmt " ++ show c
     
     
 data Assignment = Assignment {assignmentIdentifier :: Text, assignmentExpression :: Expression}
-instance Eq Assignment where
-    (==) Assignment {assignmentIdentifier = i1, assignmentExpression = e1} 
-         Assignment {assignmentIdentifier = i2, assignmentExpression = e2} = i1 == i2 && e1 == e2
+    deriving Eq
 instance Show Assignment where
     show Assignment {assignmentIdentifier = i, assignmentExpression = e} = show i ++ " = " ++ show e
 
@@ -101,22 +81,7 @@ data Expression
     | Operation2 {binaryOperator :: BinaryOperator, expression1 :: Expression, expression2 :: Expression}
     | DoExpression {doStatements :: [Statement], doExpression :: Expression}
     | LetExpression {letAssignments :: [Assignment], letExpression :: Expression}
-instance Eq Expression where
-    (==) (Const a1) (Const a2) = a1 == a2
-    (==) Assignee {assigneeName = n1} Assignee {assigneeName = n2} = n1 == n2
-    (==) Operation1 {unaryOperator = op1, opExpression = a1} 
-         Operation1 {unaryOperator = op2, opExpression = a2} = 
-         op1 == op2 && a1 == a2
-    (==) Operation2 {binaryOperator = op1, expression1 = a11, expression2 = a21} 
-         Operation2 {binaryOperator = op2, expression1 = a12, expression2 = a22} =
-         op1 == op2 && a11 == a12 && a21 == a22
-    (==) DoExpression {doStatements = s1, doExpression = e1} 
-         DoExpression {doStatements = s2, doExpression = e2} =
-         s1 == s2 && e1 == e2
-    (==) LetExpression {letAssignments = a1, letExpression = e1} 
-         LetExpression {letAssignments = a2, letExpression = e2} =
-         a1 == a2 && e1 == e2
-    (==) _ _ = False
+    deriving Eq
 instance Show Expression where
     show (Const a) = show a
     show Assignee {assigneeName = n} = show n
