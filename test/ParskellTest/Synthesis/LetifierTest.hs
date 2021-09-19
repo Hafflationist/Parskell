@@ -43,20 +43,186 @@ letifierTest = do
             letAssignments = [
                 Assignment {
                     assignmentIdentifier = Data.Text.pack "#hugo", 
-                    assignmentExpression = LetExpression {
-                        letAssignments = [
-                            Assignment {
-                                assignmentIdentifier = Data.Text.pack "a", 
-                                assignmentExpression = Const ConstantFloat {valueFloat = 42.0}
-                            }
-                        ],
-                        letExpression = Const ConstantFloat {valueFloat = 42.0}
-                    }
+                    assignmentExpression = letExpr
                 }
             ],
             letExpression = Operation1 {
                 unaryOperator = Negation, 
                 opExpression = Assignee {assigneeName = Data.Text.pack "#hugo"}
+            }
+        }
+        Parskell.Synthesis.Letifier.letifyNesting expressionTree @?= expressionTreeLetified
+        
+    it "should letify binary operator" $ do
+        let letExpr = LetExpression {
+            letAssignments = [
+                Assignment {
+                    assignmentIdentifier = Data.Text.pack "a", 
+                    assignmentExpression = Const ConstantFloat {valueFloat = 42.0}
+                }
+            ],
+            letExpression = Const ConstantFloat {valueFloat = 42.0}
+        }
+        let expressionTree = Operation2 {
+            binaryOperator = Addition, 
+            expression1 = letExpr, 
+            expression2 = Const ConstantFloat {valueFloat = 42.0}
+        }
+        let expressionTreeLetified = LetExpression {
+            letAssignments = [
+                Assignment {
+                    assignmentIdentifier = Data.Text.pack "#hugo", 
+                    assignmentExpression = letExpr
+                }
+            ],
+            letExpression = Operation2 {
+                binaryOperator = Addition, 
+                expression1 = Assignee {assigneeName = Data.Text.pack "#hugo"}, 
+                expression2 = Const ConstantFloat {valueFloat = 42.0}
+            }
+        }
+        Parskell.Synthesis.Letifier.letifyNesting expressionTree @?= expressionTreeLetified
+        
+    it "should letify (2x) binary operator" $ do
+        let letExpr1 = LetExpression {
+            letAssignments = [
+                Assignment {
+                    assignmentIdentifier = Data.Text.pack "a", 
+                    assignmentExpression = Const ConstantFloat {valueFloat = 42.0}
+                }
+            ],
+            letExpression = Const ConstantFloat {valueFloat = 42.0}
+        }
+        let letExpr2 = LetExpression {
+            letAssignments = [
+                Assignment {
+                    assignmentIdentifier = Data.Text.pack "b", 
+                    assignmentExpression = Const ConstantFloat {valueFloat = 808.0}
+                }
+            ],
+            letExpression = Const ConstantFloat {valueFloat = 808.0}
+        }
+        let expressionTree = Operation2 {
+            binaryOperator = Addition, 
+            expression1 = letExpr1, 
+            expression2 = letExpr2
+        }
+        let expressionTreeLetified = LetExpression {
+            letAssignments = [
+                Assignment {
+                    assignmentIdentifier = Data.Text.pack "#hugo1", 
+                    assignmentExpression = letExpr1
+                },
+                Assignment {
+                    assignmentIdentifier = Data.Text.pack "#hugo2", 
+                    assignmentExpression = letExpr2
+                }
+            ],
+            letExpression = Operation2 {
+                binaryOperator = Addition,
+                expression1 = Assignee {assigneeName = Data.Text.pack "#hugo1"},
+                expression2 = Assignee {assigneeName = Data.Text.pack "#hugo2"}
+            }
+        }
+        Parskell.Synthesis.Letifier.letifyNesting expressionTree @?= expressionTreeLetified
+        
+    it "should letify nested let-expression" $ do
+        let middleCalc = Operation2 {
+            binaryOperator = Addition, 
+            expression1 = Const ConstantFloat {valueFloat = 6.0}, 
+            expression2 = Const ConstantFloat {valueFloat = 13.0}
+        }
+        let leftCalc = Operation2 {
+            binaryOperator = Multiplication, 
+            expression1 = Const ConstantFloat {valueFloat = 1.0}, 
+            expression2 = middleCalc
+        }
+        let expressionTree = Operation2 {
+            binaryOperator = Multiplication, 
+            expression1 = leftCalc, 
+            expression2 = Const ConstantFloat {valueFloat = 4.0}
+        }
+        let expressionTreeLetified = LetExpression {
+            letAssignments = [
+                Assignment {
+                    assignmentIdentifier = Data.Text.pack "#hugo", 
+                    assignmentExpression = LetExpression {
+                        letAssignments = [
+                            Assignment {
+                                assignmentIdentifier = Data.Text.pack "#hugo", 
+                                assignmentExpression = middleCalc
+                            }
+                        ],
+                        letExpression = Operation2 {
+                            binaryOperator = Multiplication, 
+                            expression1 = Const ConstantFloat {valueFloat = 1.0}, 
+                            expression2 = Assignee {assigneeName = Data.Text.pack "#hugo"}
+                        }
+                    }
+                }
+            ],
+            letExpression = Operation2 {
+                binaryOperator = Multiplication,
+                expression1 = Assignee {assigneeName = Data.Text.pack "#hugo"},
+                expression2 = Const ConstantFloat {valueFloat = 4.0}
+            }
+        }
+        Parskell.Synthesis.Letifier.letifyNesting expressionTree @?= expressionTreeLetified
+        
+    it "should letify do-expression" $ do
+        let middleCalc = Operation2 {
+            binaryOperator = Addition, 
+            expression1 = Const ConstantFloat {valueFloat = 6.0}, 
+            expression2 = Const ConstantFloat {valueFloat = 13.0}
+        }
+        let leftCalc = Operation2 {
+            binaryOperator = Multiplication, 
+            expression1 = Const ConstantFloat {valueFloat = 1.0}, 
+            expression2 = middleCalc
+        }
+        let doExpressionExpressionPart = Operation2 {
+            binaryOperator = Multiplication, 
+            expression1 = leftCalc, 
+            expression2 = Const ConstantFloat {valueFloat = 4.0}
+        }
+        let expressionTree = DoExpression {
+            doStatements = [
+                GenericStatement { statementContent = Data.Text.pack . show $ [LiteralString {content = Data.Text.pack "Hugobert"}]},
+                GenericStatement { statementContent = Data.Text.pack . show $ [LiteralString {content = Data.Text.pack "Sinnloser Text"}]},
+                PrintStatement { printableExpression = Const ConstantFloat {valueFloat = 42.0}}
+            ], 
+            doExpression = doExpressionExpressionPart
+        }
+        let expressionTreeLetified = DoExpression {
+            doStatements = [
+                GenericStatement { statementContent = Data.Text.pack . show $ [LiteralString {content = Data.Text.pack "Hugobert"}]},
+                GenericStatement { statementContent = Data.Text.pack . show $ [LiteralString {content = Data.Text.pack "Sinnloser Text"}]},
+                PrintStatement { printableExpression = Const ConstantFloat {valueFloat = 42.0}}
+            ], 
+            doExpression = LetExpression {
+                letAssignments = [
+                    Assignment {
+                        assignmentIdentifier = Data.Text.pack "#hugo", 
+                        assignmentExpression = LetExpression {
+                            letAssignments = [
+                                Assignment {
+                                    assignmentIdentifier = Data.Text.pack "#hugo", 
+                                    assignmentExpression = middleCalc
+                                }
+                            ],
+                            letExpression = Operation2 {
+                                binaryOperator = Multiplication, 
+                                expression1 = Const ConstantFloat {valueFloat = 1.0}, 
+                                expression2 = Assignee {assigneeName = Data.Text.pack "#hugo"}
+                            }
+                        }
+                    }
+                ],
+                letExpression = Operation2 {
+                    binaryOperator = Multiplication,
+                    expression1 = Assignee {assigneeName = Data.Text.pack "#hugo"},
+                    expression2 = Const ConstantFloat {valueFloat = 4.0}
+                }
             }
         }
         Parskell.Synthesis.Letifier.letifyNesting expressionTree @?= expressionTreeLetified
