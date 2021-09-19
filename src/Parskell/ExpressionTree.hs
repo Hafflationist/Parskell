@@ -89,6 +89,6 @@ instance Show Expression where
     show Operation2 {binaryOperator = op, expression1 = a1, expression2 = a2} = 
         "(" ++ show a1 ++ " " ++ show op ++ " " ++ show a2 ++ ")"
     show DoExpression {doStatements = ss, doExpression = expr} =
-        " (do [ " ++ show ss ++ " ] " ++ show expr ++ "done) "
+        " (do " ++ show ss ++ " " ++ show expr ++ "done) "
     show LetExpression {letAssignments = a1, letExpression = e1} =
-        " (let [ " ++ show a1 ++ " ] in " ++ show e1 ++ " return) "
+        " (let " ++ show a1 ++ " in " ++ show e1 ++ " return) "

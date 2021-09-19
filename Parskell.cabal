@@ -34,6 +34,7 @@ library
       Parskell.Synthesis.Counter
       Parskell.Synthesis.Evaluation
       Parskell.Synthesis.Letifier
+      Parskell.Synthesis.Register
   other-modules:
       Paths_Parskell
   hs-source-dirs:
