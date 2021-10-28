@@ -1,9 +1,10 @@
 module ParskellTest.Synthesis.LetifierTest where
 
 import Data.Text
-import Parskell.Synthesis.Letifier
 import Parskell.ExpressionTree
 import Parskell.Lexing.Tokens
+import Parskell.Synthesis.Counter as Counter
+import Parskell.Synthesis.Letifier
 import Test.Hspec
 import Test.HUnit
 
@@ -23,7 +24,10 @@ letifierTest = do
             ],
             letExpression = expr
         } -- let a = 42 in a ** 20i return
-        Parskell.Synthesis.Letifier.letifyNesting expressionTree @?= expressionTree
+        let toTest = Counter.start 0
+                   . Parskell.Synthesis.Letifier.letifyNesting
+                   $ expressionTree
+        toTest @?= expressionTree
         
     it "should letify unary operator" $ do
         let letExpr = LetExpression {
@@ -42,16 +46,19 @@ letifierTest = do
         let expressionTreeLetified = LetExpression {
             letAssignments = [
                 Assignment {
-                    assignmentIdentifier = Data.Text.pack "#hugo", 
+                    assignmentIdentifier = Data.Text.pack "#0", 
                     assignmentExpression = letExpr
                 }
             ],
             letExpression = Operation1 {
                 unaryOperator = Negation, 
-                opExpression = Assignee {assigneeName = Data.Text.pack "#hugo"}
+                opExpression = Assignee {assigneeName = Data.Text.pack "#0"}
             }
         }
-        Parskell.Synthesis.Letifier.letifyNesting expressionTree @?= expressionTreeLetified
+        let toTest = Counter.start 0
+                   . Parskell.Synthesis.Letifier.letifyNesting
+                   $ expressionTree
+        toTest @?= expressionTreeLetified
         
     it "should letify binary operator" $ do
         let letExpr = LetExpression {
@@ -71,17 +78,20 @@ letifierTest = do
         let expressionTreeLetified = LetExpression {
             letAssignments = [
                 Assignment {
-                    assignmentIdentifier = Data.Text.pack "#hugo", 
+                    assignmentIdentifier = Data.Text.pack "#0", 
                     assignmentExpression = letExpr
                 }
             ],
             letExpression = Operation2 {
                 binaryOperator = Addition, 
-                expression1 = Assignee {assigneeName = Data.Text.pack "#hugo"}, 
+                expression1 = Assignee {assigneeName = Data.Text.pack "#0"}, 
                 expression2 = Const ConstantFloat {valueFloat = 42.0}
             }
         }
-        Parskell.Synthesis.Letifier.letifyNesting expressionTree @?= expressionTreeLetified
+        let toTest = Counter.start 0
+                   . Parskell.Synthesis.Letifier.letifyNesting
+                   $ expressionTree
+        toTest @?= expressionTreeLetified
         
     it "should letify (2x) binary operator" $ do
         let letExpr1 = LetExpression {
@@ -110,21 +120,24 @@ letifierTest = do
         let expressionTreeLetified = LetExpression {
             letAssignments = [
                 Assignment {
-                    assignmentIdentifier = Data.Text.pack "#hugo1", 
+                    assignmentIdentifier = Data.Text.pack "#0", 
                     assignmentExpression = letExpr1
                 },
                 Assignment {
-                    assignmentIdentifier = Data.Text.pack "#hugo2", 
+                    assignmentIdentifier = Data.Text.pack "#1", 
                     assignmentExpression = letExpr2
                 }
             ],
             letExpression = Operation2 {
                 binaryOperator = Addition,
-                expression1 = Assignee {assigneeName = Data.Text.pack "#hugo1"},
-                expression2 = Assignee {assigneeName = Data.Text.pack "#hugo2"}
+                expression1 = Assignee {assigneeName = Data.Text.pack "#0"},
+                expression2 = Assignee {assigneeName = Data.Text.pack "#1"}
             }
         }
-        Parskell.Synthesis.Letifier.letifyNesting expressionTree @?= expressionTreeLetified
+        let toTest = Counter.start 0
+                   . Parskell.Synthesis.Letifier.letifyNesting
+                   $ expressionTree
+        toTest @?= expressionTreeLetified
         
     it "should letify nested let-expression" $ do
         let middleCalc = Operation2 {
@@ -145,29 +158,32 @@ letifierTest = do
         let expressionTreeLetified = LetExpression {
             letAssignments = [
                 Assignment {
-                    assignmentIdentifier = Data.Text.pack "#hugo", 
+                    assignmentIdentifier = Data.Text.pack "#0", 
                     assignmentExpression = LetExpression {
                         letAssignments = [
                             Assignment {
-                                assignmentIdentifier = Data.Text.pack "#hugo", 
+                                assignmentIdentifier = Data.Text.pack "#1", 
                                 assignmentExpression = middleCalc
                             }
                         ],
                         letExpression = Operation2 {
                             binaryOperator = Multiplication, 
                             expression1 = Const ConstantFloat {valueFloat = 1.0}, 
-                            expression2 = Assignee {assigneeName = Data.Text.pack "#hugo"}
+                            expression2 = Assignee {assigneeName = Data.Text.pack "#1"}
                         }
                     }
                 }
             ],
             letExpression = Operation2 {
                 binaryOperator = Multiplication,
-                expression1 = Assignee {assigneeName = Data.Text.pack "#hugo"},
+                expression1 = Assignee {assigneeName = Data.Text.pack "#0"},
                 expression2 = Const ConstantFloat {valueFloat = 4.0}
             }
         }
-        Parskell.Synthesis.Letifier.letifyNesting expressionTree @?= expressionTreeLetified
+        let toTest = Counter.start 0
+                   . Parskell.Synthesis.Letifier.letifyNesting
+                   $ expressionTree
+        toTest @?= expressionTreeLetified
         
     it "should letify do-expression" $ do
         let middleCalc = Operation2 {
@@ -202,27 +218,30 @@ letifierTest = do
             doExpression = LetExpression {
                 letAssignments = [
                     Assignment {
-                        assignmentIdentifier = Data.Text.pack "#hugo", 
+                        assignmentIdentifier = Data.Text.pack "#0", 
                         assignmentExpression = LetExpression {
                             letAssignments = [
                                 Assignment {
-                                    assignmentIdentifier = Data.Text.pack "#hugo", 
+                                    assignmentIdentifier = Data.Text.pack "#1", 
                                     assignmentExpression = middleCalc
                                 }
                             ],
                             letExpression = Operation2 {
                                 binaryOperator = Multiplication, 
                                 expression1 = Const ConstantFloat {valueFloat = 1.0}, 
-                                expression2 = Assignee {assigneeName = Data.Text.pack "#hugo"}
+                                expression2 = Assignee {assigneeName = Data.Text.pack "#1"}
                             }
                         }
                     }
                 ],
                 letExpression = Operation2 {
                     binaryOperator = Multiplication,
-                    expression1 = Assignee {assigneeName = Data.Text.pack "#hugo"},
+                    expression1 = Assignee {assigneeName = Data.Text.pack "#0"},
                     expression2 = Const ConstantFloat {valueFloat = 4.0}
                 }
             }
         }
-        Parskell.Synthesis.Letifier.letifyNesting expressionTree @?= expressionTreeLetified
+        let toTest = Counter.start 0
+                   . Parskell.Synthesis.Letifier.letifyNesting
+                   $ expressionTree
+        toTest @?= expressionTreeLetified

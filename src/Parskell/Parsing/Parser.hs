@@ -72,13 +72,12 @@ parseExpressionDo _ = Left ["'do'-block does not begin with token 'do'! This err
 parseAssignment :: [Token] -> Either [String] Assignment
 parseAssignment tokens =
     let tokensClean = Data.List.filter (\ t -> t `notElem` [Newline, Semicolon, Ignore]) tokens
-        tokensClean2 = trace (show tokensClean) tokensClean
         getTriplet (a : b : c) = Right (a, b, c)
         getTriplet _ = Left ["Incomplete assignment!"]
-        getIdentifierName Identifier {name = nameVal} = Right nameVal
+        getIdentifierName Identifier { name = nameVal } = Right nameVal
         getIdentifierName  _ = Left ["Identifier expected before '='!"]
     in do
-        triplet <- getTriplet tokensClean2
+        triplet <- getTriplet tokensClean
         let (tokenIdentifier, tokenOp, tokensExpression) = triplet
         if tokenOp == Operator {name = Data.Text.pack "="}
         then do expression <- parseExpression tokensExpression
@@ -212,7 +211,7 @@ parseExpressionConst [LiteralNumber {content = c}] = do
     return (Const (ConstantFloat { valueFloat = value }))
 parseExpressionConst [LiteralString {content = c}] = 
     Right (Const (ConstantString { valueString = c }))
-parseExpressionConst [Identifier {name = n}] = 
+parseExpressionConst [Identifier { name = n }] = 
     Right Assignee {assigneeName = n}
 parseExpressionConst thing = 
     Left ["Expected constant literal! (" ++ show thing ++ ")"]

@@ -1,7 +1,9 @@
 {-# LANGUAGE TupleSections #-}
 
-module Parskell.Synthesis.Counter (retrieve, start) where
+module Parskell.Synthesis.Counter (retrieve, start, Counter(..)) where
   
+import Control.Monad.Zip
+    
 newtype Counter a = Counting { coreFunc :: Int -> (a, Int) }
   
   
@@ -13,9 +15,9 @@ retrieve =
     
     
     
-start :: Counter a -> Int -> a
-start Counting {coreFunc = f} x = fst . f $ (x - 1)
-  
+start :: Int -> Counter a -> a
+start x Counting {coreFunc = f} = fst . f $ (x - 1)
+
 
 
 map :: (a -> b) -> Counter a -> Counter b
@@ -49,3 +51,9 @@ instance Applicative Counter where
         
 instance Monad Counter where
     (>>=) = Parskell.Synthesis.Counter.bind
+    
+instance MonadZip Counter where
+    mzip counterA counterB = do
+        valueA <- counterA
+        valueB <- counterB
+        return (valueA, valueB)
